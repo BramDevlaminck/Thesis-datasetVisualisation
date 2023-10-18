@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -37,7 +39,7 @@ def make_alphabet_complete(data: tuple[list[str], list[int]]) -> tuple[list[str]
     return labels, counts
 
 
-def create_barh_acid_code_occurrences(proteins: list[str]):
+def create_barh_acid_code_occurrences(proteins: list[str], short_name: str, output_file: str | None = None):
     """Creates a horizontal barchart of the distribution of the letters in the proteins"""
 
     statistics = calculate_character_statistics(proteins)
@@ -51,7 +53,8 @@ def create_barh_acid_code_occurrences(proteins: list[str]):
         counts,
         'Amino Acid Code',
         'Number of Occurrences',
-        'Number of Occurrences per\nAmino Acid code for the swissprot_var2 search file with missed cleavage'
+        f'Number of Occurrences per\nAmino Acid code for the {short_name}',
+        output_file
     )
 
 
@@ -80,14 +83,15 @@ def create_barchart_vertical(statistics: list[any]):
     plt.savefig("Graphs/character_occurrences_swissprot_var1_protein_database.jpg")
 
 
-def create_barh_protein_length(proteins: list[str], bin_size: int):
+def create_barh_protein_length(proteins: list[str], bin_size: int, short_name: str, max_allowed_protein_length: float, output_file: str | None = None):
     """From the given proteins calculate their length and create a horizontal barchart with the data"""
     statistics = calculate_length_statistics(proteins)
-    max_bin = (max(statistics) // bin_size) * bin_size
+    max_bin = int(min(max_allowed_protein_length - bin_size, (max(statistics) // bin_size) * bin_size))
     frequency_dict: dict[int, int] = {key: 0 for key in range(0, max_bin + bin_size, bin_size)}
 
     for val in statistics:
-        frequency_dict[(val // bin_size) * bin_size] += 1
+        if val < max_allowed_protein_length:
+            frequency_dict[(val // bin_size) * bin_size] += 1
 
     labels, counts = list(zip(*frequency_dict.items()))
     labels = [f"{label}-{label + bin_size}" for label in labels]
@@ -97,7 +101,8 @@ def create_barh_protein_length(proteins: list[str], bin_size: int):
         counts,
         "Protein Length",
         "Number of Occurrences",
-        "Distribution of protein length for the swissprot_var2 search file with missed cleavage"
+        f"Distribution of protein length for the {short_name}",
+        output_file
     )
 
 
@@ -132,12 +137,92 @@ def create_barh(labels: list[any], counts: list[int], ylabel: str, x_label: str,
         plt.show()
 
 
-if __name__ == '__main__':
-    filename = "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv"
-    with open(filename) as fp:
-        data = []
-        for line in fp:
-            data.append(line.split("\t")[-1].rstrip('\n'))
+def protein_search_distribution(searchResults: list[tuple[bool, int, float]], bin_size: int):
+    found_list, proteins_size_list, search_time_list = list(zip(*searchResults))
 
-        create_barh_acid_code_occurrences(data)
-        create_barh_protein_length(data, 5)
+    max_bin = int((max(search_time_list) // bin_size) * bin_size)
+    frequency_dict: dict[int, int] = {key: 0 for key in range(0, max_bin + bin_size, bin_size)}
+
+    for val in search_time_list:
+        frequency_dict[(val // bin_size) * bin_size] += 1
+
+    labels, counts = list(zip(*frequency_dict.items()))
+    labels = [f"{label}-{label + bin_size}" for label in labels]
+
+    create_barh(
+        labels,
+        counts,
+        "Time needed to search",
+        "Number of Occurrences",
+        "Distribution of search time for the swissprot_var2 search file with missed cleavage"
+    )
+
+
+@dataclass
+class ProteinLengthGraphSettings:
+    max_allowed_length: float
+    bin_size: int
+
+@dataclass
+class GraphInfoForfile:
+    """Basic data class that keeps the data that is needed for creating all the needed graphs for a file together"""
+    short_name: str
+    proteinLengthGraphSettings: list[ProteinLengthGraphSettings]
+    input_file_location: str
+
+
+if __name__ == '__main__':
+    inputForGraphs = [
+        GraphInfoForfile(
+            "immunopeptidomics database",
+            [
+                ProteinLengthGraphSettings(float('inf'), 1000),
+                ProteinLengthGraphSettings(1000, 50)
+            ],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/protein_database.tsv"),
+        GraphInfoForfile(
+            "swissprot database",
+            [
+                ProteinLengthGraphSettings(float('inf'), 1000),
+                ProteinLengthGraphSettings(1000, 50)
+            ],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/protein_database.tsv"),
+        GraphInfoForfile(
+            "immunopeptidomics searchfile",
+            [ProteinLengthGraphSettings(float('inf'), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/search_file.tsv"),
+        GraphInfoForfile(
+            "swissprot searchfile without missed cleavage (var 2)",
+            [ProteinLengthGraphSettings(float('inf'), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv"),
+        GraphInfoForfile(
+            "swissprot searchfile with missed cleavage (var 1)",
+            [ProteinLengthGraphSettings(float('inf'), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv")
+    ]
+
+    for graphInput in inputForGraphs:
+        with open(graphInput.input_file_location) as fp:
+            data = []
+            for line in fp:
+                data.append(line.split("\t")[-1].rstrip('\n'))
+
+            create_barh_acid_code_occurrences(data, graphInput.short_name)
+            # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
+            for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
+                create_barh_protein_length(data, proteinLengthGraphSetting.bin_size, graphInput.short_name, proteinLengthGraphSetting.max_allowed_length)
+
+    filenames = [
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_immunopeptidomics_avg10.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var1_avg10.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var2_avg10.txt"
+    ]
+
+    for filename in filenames:
+        with open(filename) as fp:
+            data = []
+            for line in fp:
+                found, protein_size, search_time = line.split(";")
+                search_time = search_time.rstrip("\n")
+                data.append((bool(found), int(protein_size), float(search_time)))
+            protein_search_distribution(data, 1)
