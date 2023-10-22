@@ -296,7 +296,7 @@ def create_heatmap(search_results: list[tuple[bool, int, float]]):
 
 
     im, cbar = heatmap(np.array(binned_data), y_labels, x_labels, ax=ax,
-                       cmap="YlGn", cbarlabel="number of occurrences")
+                       cmap="Blues", cbarlabel="number of occurrences")
     texts = annotate_heatmap(im, valfmt="{x:,.0f}") # TODO: set texts right
 
     plt.gcf().set_size_inches(8.27, 8.27)
