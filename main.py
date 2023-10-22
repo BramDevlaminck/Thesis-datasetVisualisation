@@ -167,12 +167,10 @@ def protein_search_distribution(searchResults: list[tuple[bool, int, float]], bi
     create_barh(
         labels,
         counts,
-        "Time needed to search",
+        "Search time in ms",
         "Number of Occurrences",
         f"Distribution of search time for the {short_name}"
     )
-
-
 
 
 @dataclass
@@ -189,7 +187,14 @@ class GraphInfoForfile:
     input_file_location: str
 
 
-def heatmap(data, row_labels, col_labels, ax=None,
+@dataclass
+class ConfigurationForSearchTimeGraphs:
+    bin_size: int
+    input_file_location: str
+    short_name: str
+
+
+def heatmap(data, row_labels, col_labels, short_name: str, ax=None,
             cbar_kw=None, cbarlabel="", **kwargs):
     if ax is None:
         ax = plt.gca()
@@ -209,7 +214,7 @@ def heatmap(data, row_labels, col_labels, ax=None,
     ax.set_yticks(np.arange(data.shape[0]), labels=row_labels)
     ax.set_ylabel("Protein length", rotation=90)
     ax.set_xlabel("Search time in ms")
-    ax.set_title("Heatmap of the distribution of search time and protein length")
+    ax.set_title(f"Heatmap of the needed search time in combination with the protein lengths\n for {short_name}")
 
     # Let the horizontal axes labeling appear on top.
     # ax.tick_params(top=True, bottom=False,
@@ -264,18 +269,23 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
     return texts
 
 
-def create_heatmap(search_results: list[tuple[bool, int, float]]):
+def create_heatmap_of_search_execution(search_results: list[tuple[bool, int, float]], short_name: str):
     fig, ax = plt.subplots()
 
     num_x_bins = 5
     num_y_bins = 5
-    max_protein_length = max(map(lambda l: l[1], search_results))  # to be just a bit bigger than the actual max value, is useful during mapping to the bins
-    max_protein_length += max_protein_length * 0.01
+    max_protein_length = max(map(lambda l: l[1],
+                                 search_results))  # to be just a bit bigger than the actual max value, is useful during mapping to the bins
+    max_protein_length += max_protein_length * 0.001
     max_protein_length = round_up(max_protein_length, 10)
     max_search_time = max(map(lambda l: l[2], search_results))
-    max_search_time += max_search_time * 0.01
-    max_search_time = round_up(max_search_time, 50)
-
+    # edge case where every sequence is found in 1 ms, we only want 1 bin in the time dimension in that case
+    if max_search_time >= 1:
+        max_search_time += max_search_time * 0.001
+        max_search_time = round_up(max_search_time, 50)
+    else:
+        num_x_bins = 1
+        max_search_time = 1
 
     x_labels = []  # searchTimes
     y_labels = []  # protein length
@@ -283,10 +293,10 @@ def create_heatmap(search_results: list[tuple[bool, int, float]]):
 
     # create empty binned_data matrix and fill in the axis labels
     for i in range(num_x_bins):
-        x_labels.append(f"{i*max_search_time//num_x_bins}-{(i+1)*max_search_time//num_x_bins}")
+        x_labels.append(f"{i * max_search_time // num_x_bins}-{(i + 1) * max_search_time // num_x_bins}")
     for i in range(num_y_bins):
         binned_data.append([0 for _ in range(num_x_bins)])
-        y_labels.append(f"{i*max_protein_length//num_y_bins}-{(i+1)*max_protein_length//num_y_bins}")
+        y_labels.append(f"{i * max_protein_length // num_y_bins}-{(i + 1) * max_protein_length // num_y_bins}")
 
     # fill in the binned_data matrix
     for (_, size, search_time) in search_results:
@@ -294,12 +304,18 @@ def create_heatmap(search_results: list[tuple[bool, int, float]]):
         x = floor(size / max_protein_length * num_y_bins)
         binned_data[x][y] += 1
 
+    im, cbar = heatmap(
+        np.array(binned_data),
+        y_labels, x_labels,
+        short_name,
+        ax=ax,
+        cmap="Blues",
+        cbarlabel="number of occurrences",
+        cbar_kw={"shrink": 0.9} # add shrink to make vertical height of the bar a bit smaller
+    )
+    texts = annotate_heatmap(im, valfmt="{x:,.0f}")
 
-    im, cbar = heatmap(np.array(binned_data), y_labels, x_labels, ax=ax,
-                       cmap="Blues", cbarlabel="number of occurrences")
-    texts = annotate_heatmap(im, valfmt="{x:,.0f}") # TODO: set texts right
-
-    plt.gcf().set_size_inches(8.27, 8.27)
+    plt.gcf().set_size_inches(8.27, 7.27)
     fig.tight_layout()
     plt.show()
 
@@ -334,42 +350,52 @@ if __name__ == '__main__':
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv")
     ]
 
-    # for graphInput in inputForGraphs:
-    #     with open(graphInput.input_file_location) as fp:
-    #         data = []
-    #         for line in fp:
-    #             data.append(line.split("\t")[-1].rstrip('\n'))
-    #
-    #         create_barh_acid_code_occurrences(data, graphInput.short_name)
-    #         # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
-    #         for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
-    #             create_barh_protein_length(data, proteinLengthGraphSetting.bin_size, graphInput.short_name,
-    #                                        proteinLengthGraphSetting.max_allowed_length)
+    for graphInput in inputForGraphs:
+        with open(graphInput.input_file_location) as fp:
+            data = []
+            for line in fp:
+                data.append(line.split("\t")[-1].rstrip('\n'))
 
-    filenames = [
-        # (1,
-        #  "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_immunopeptidomics_avg10.txt",
-        #  "immunopeptidomics search file for only checking if a match exists"),
-        # (1,
-        #  "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var1_avg10.txt",
-        #  "swissprot with missed cleavage (var1) for only checking if a match exists"),
-        # (1,
-        #  "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var2_avg10.txt",
-        #  "swissprot without missed cleavage (var2) for only checking if a match exists"),
-        (100,
-         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/HitAndSearch/search_cpp_matchAndSearchTree_immunopeptidomics_avg10.txt",
-         "immunopeptidomics search file with traversal of the whole subtree after match"),
-        (50,
-         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/HitAndSearch/search_cpp_matchAndSearchTree_swissprot_var1_avg10.txt",
-         "swissprot with missed cleavage (var1) with traversal of the whole subtree after match")
+            create_barh_acid_code_occurrences(data, graphInput.short_name)
+            # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
+            for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
+                create_barh_protein_length(data, proteinLengthGraphSetting.bin_size, graphInput.short_name,
+                                           proteinLengthGraphSetting.max_allowed_length)
+
+    search_time_graph_configurations = [
+        ConfigurationForSearchTimeGraphs(
+            1,
+             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_immunopeptidomics_avg10.txt",
+             "immunopeptidomics search file for only checking if a match exists",
+        ),
+        ConfigurationForSearchTimeGraphs(
+            1,
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var1_avg10.txt",
+            "swissprot with missed cleavage (var1) for only checking if a match exists",
+        ),
+        ConfigurationForSearchTimeGraphs(
+            1,
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var2_avg10.txt",
+            "swissprot without missed cleavage (var2) for only checking if a match exists",
+        ),
+        ConfigurationForSearchTimeGraphs(
+            100,
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/HitAndSearch/search_cpp_matchAndSearchTree_immunopeptidomics_avg10.txt",
+            "immunopeptidomics search file with traversal of the whole subtree after match",
+        ),
+        ConfigurationForSearchTimeGraphs(
+            50,
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/HitAndSearch/search_cpp_matchAndSearchTree_swissprot_var1_avg10.txt",
+            "swissprot with missed cleavage (var1) with traversal of the whole subtree after match",
+        )
     ]
 
-    for (bin_size, filename, short_name) in filenames:
-        with open(filename) as fp:
+    for configuration in search_time_graph_configurations:
+        with open(configuration.input_file_location) as fp:
             data = []
             for line in fp:
                 found, protein_size, search_time = line.split(";")
                 search_time = search_time.rstrip("\n")
                 data.append((bool(found), int(protein_size), float(search_time)))
-            protein_search_distribution(data, bin_size, short_name)
-            create_heatmap(data)
+            protein_search_distribution(data, configuration.bin_size, configuration.short_name)
+            create_heatmap_of_search_execution(data, configuration.short_name)
