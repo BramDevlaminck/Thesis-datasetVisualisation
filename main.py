@@ -86,7 +86,7 @@ def create_barchart_vertical(statistics: list[any]):
     # Add labels and a title
     plt.xlabel('Amino Acid Code')
     plt.ylabel('Number of Occurrences')
-    plt.title('Number of Occurrences per\nAmino Acid code for the swissprot_var1 dataset')
+    plt.title('Number of Occurrences per\nAmino Acid code for the swissprot dataset')
 
     # Add a grid
     plt.grid(True, linestyle='--', alpha=0.5, axis='y')
@@ -144,7 +144,11 @@ def create_barh(labels: list[any], counts: list[int], ylabel: str, x_label: str,
 
     # Add a grid and set image size
     plt.grid(True, linestyle='--', alpha=0.5, axis='x')
-    plt.gcf().set_size_inches(11.69, 8.27)
+
+    # edge case for graph with only 1 bar, reduce the height to prevent a really thiccc bar
+    image_height = 4 if len(labels) == 1 else 8.27
+
+    plt.gcf().set_size_inches(11.69, image_height)
 
     if file_name is not None:
         plt.savefig(file_name)
@@ -214,7 +218,7 @@ def heatmap(data, row_labels, col_labels, short_name: str, ax=None,
     ax.set_yticks(np.arange(data.shape[0]), labels=row_labels)
     ax.set_ylabel("Protein length", rotation=90)
     ax.set_xlabel("Search time in ms")
-    ax.set_title(f"Heatmap of the needed search time in combination with the protein lengths\n for {short_name}")
+    ax.set_title(f"Heatmap of the needed search time in combination with the protein lengths for\n{short_name}")
 
     # Let the horizontal axes labeling appear on top.
     # ax.tick_params(top=True, bottom=False,
@@ -341,11 +345,11 @@ if __name__ == '__main__':
             [ProteinLengthGraphSettings(float('inf'), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/search_file.tsv"),
         GraphInfoForfile(
-            "swissprot searchfile without missed cleavage (var 2)",
+            "swissprot searchfile with missed cleavage (var 2)",
             [ProteinLengthGraphSettings(float('inf'), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv"),
         GraphInfoForfile(
-            "swissprot searchfile with missed cleavage (var 1)",
+            "swissprot searchfile without missed cleavage (var 1)",
             [ProteinLengthGraphSettings(float('inf'), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv")
     ]
@@ -371,12 +375,12 @@ if __name__ == '__main__':
         ConfigurationForSearchTimeGraphs(
             1,
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var1_avg10.txt",
-            "swissprot with missed cleavage (var1) for only checking if a match exists",
+            "swissprot without missed cleavage (var1) for only checking if a match exists",
         ),
         ConfigurationForSearchTimeGraphs(
             1,
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/Hit/search_cpp_onlyMatch_swissprot_var2_avg10.txt",
-            "swissprot without missed cleavage (var2) for only checking if a match exists",
+            "swissprot with missed cleavage (var2) for only checking if a match exists",
         ),
         ConfigurationForSearchTimeGraphs(
             100,
@@ -386,7 +390,12 @@ if __name__ == '__main__':
         ConfigurationForSearchTimeGraphs(
             50,
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/HitAndSearch/search_cpp_matchAndSearchTree_swissprot_var1_avg10.txt",
-            "swissprot with missed cleavage (var1) with traversal of the whole subtree after match",
+            "swissprot without missed cleavage (var1) with traversal of the whole subtree after match",
+        ),
+        ConfigurationForSearchTimeGraphs(
+            50,
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/CPP_ukkonen_CCB/SearchTime/HitAndSearch/search_cpp_matchAndSearchTree_swissprot_var2_avg10.txt",
+            "swissprot with missed cleavage (var2) with traversal of the whole subtree after match",
         )
     ]
 
