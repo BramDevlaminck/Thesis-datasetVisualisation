@@ -7,6 +7,8 @@ from time_output_parser import parse_and_aggregate_time_output_file
 
 """File that generates grouped bar charts to compare the execution of different implementations"""
 
+colours = ["cadetblue", "blanchedalmond"]
+
 
 @dataclass
 class ComparisonGraph:
@@ -31,9 +33,17 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
         1 / 3
     )  # the width of the bars (divide by 1 bigger than the number of algorithms we are comparing!)
     multiplier = 0
-    for key, values in data.data.items():
+    for i, (key, values) in enumerate(data.data.items()):
         offset = width * multiplier
-        bars = ax.barh(y_pos + offset, width=values, height=width, label=key)
+        bars = ax.barh(
+            y_pos + offset,
+            width=values,
+            height=width,
+            label=key,
+            color=colours[i],
+            edgecolor="black",
+            alpha=0.7,
+        )
         ax.bar_label(bars, padding=3, labels=["{:.2f}".format(val) for val in values])
         multiplier += 1
 
@@ -107,11 +117,11 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(
             {
-                "C++": [val.max_mem_size for val in cpp_execution_data],
-                "Rust": [val.max_mem_size for val in rust_execution_data],
+                "C++": [val.max_mem_size * 1e-6 for val in cpp_execution_data],
+                "Rust": [val.max_mem_size * 1e-6 for val in rust_execution_data],
             },
-            "Maximale gebruikte hoeveelheid geheugen in kbytes voor het opbouwen van de suffixboom via Ukkonen",
-            "Gebruikt geheugen in kbytes",
+            "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de suffixboom via Ukkonen",
+            "Gebruikt geheugen in GB",
             "proteinen databank",
             ["Human-Prot", "Swiss-Prot"],
         ),
