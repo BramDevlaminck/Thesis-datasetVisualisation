@@ -88,8 +88,8 @@ if __name__ == "__main__":
                 "C++": [209.522, 170.814, 179.346],
                 "Rust": [226.07584635416666, 175.210205078125, 151.49943033854166],
             },
-            "Gemiddelde Tijd in ms om een match voor alle Peptiden te zoeken",
-            "Tijd in ms",
+            "Tijd in milliseconden om een match voor alle Peptiden te zoeken",
+            "Tijd in milliseconden",
             "Zoekbestand",
         ),
         ComparisonGraph(
@@ -97,12 +97,12 @@ if __name__ == "__main__":
                 "C++": [
                     1.45269e06,
                     1.57777e07,
-                    0,
-                ],  # TODO: laatste waarde is een placeholder, wordt atm uitgerekend
+                    1.54936e07,
+                ],
                 "Rust": [861712.7821858724, 287.7971191406, 210.38191731770834],
             },
-            "Gemiddelde Tijd in ms om met doorzoeken van subboom alle Peptiden te zoeken",
-            "Tijd in ms",
+            "Tijd in milliseconden om met doorzoeken van subboom alle Peptiden te zoeken",
+            "Tijd in milliseconden",
             "Zoekbestand",
         ),
         ComparisonGraph(
@@ -110,9 +110,9 @@ if __name__ == "__main__":
                 "C++": [val.execution_time_seconds for val in cpp_execution_data],
                 "Rust": [val.execution_time_seconds for val in rust_execution_data],
             },
-            "Gemiddelde Tijd in seconden voor het opbouwen van de suffixboom via Ukkonen",
+            "Tijd in seconden voor het opbouwen van de suffixboom via Ukkonen",
             "Tijd in seconden",
-            "proteinen databank",
+            "Proteïne databank",
             ["Human-Prot", "Swiss-Prot"],
         ),
         ComparisonGraph(
@@ -121,8 +121,8 @@ if __name__ == "__main__":
                 "Rust": [val.max_mem_size * 1e-6 for val in rust_execution_data],
             },
             "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de suffixboom via Ukkonen",
-            "Gebruikt geheugen in GB",
-            "proteinen databank",
+            "Geheugengebruik in GB",
+            "Proteïne databank",
             ["Human-Prot", "Swiss-Prot"],
         ),
     ]
