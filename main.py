@@ -69,9 +69,9 @@ def create_barh_acid_code_occurrences(
     create_barh(
         labels,
         counts,
-        "Amino Acid Code",
-        "Number of Occurrences",
-        f"Number of Occurrences per\nAmino Acid code for the {short_name}",
+        "Aminozuur",
+        "Aantal voorkomens",
+        f"Aantal voorkomens per \naminozuur voor {short_name}",
         output_file,
     )
 
@@ -133,9 +133,9 @@ def create_barh_protein_length(
     create_barh(
         labels,
         counts,
-        f"{sequence_type} Length",
-        "Number of Occurrences",
-        f"Distribution of {sequence_type.lower()} length for the {short_name}",
+        f"{sequence_type} lengte",
+        "Aantal voorkomens",
+        f"Verdeling van de {sequence_type.lower()} lengte voor {short_name}",
         output_file,
     )
 
@@ -415,37 +415,37 @@ def create_heatmap_of_search_execution(
 if __name__ == "__main__":
     inputForGraphs = [
         GraphInfoForfile(
-            "Human-Prot database",
+            "de Human-Prot databank",
             [
                 ProteinLengthGraphSettings(float("inf"), 1000),
                 ProteinLengthGraphSettings(1000, 50),
             ],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/protein_database.tsv",
-            "Protein",
+            "Proteïne",
         ),
         GraphInfoForfile(
-            "Swiss-Prot database",
+            "de Swiss-Prot databank",
             [
                 ProteinLengthGraphSettings(float("inf"), 1000),
                 ProteinLengthGraphSettings(1000, 50),
             ],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/protein_database.tsv",
-            "Protein",
+            "Proteïne",
         ),
         GraphInfoForfile(
-            "Human-Prot search file",
+            "het Human-Prot zoekbestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/search_file.tsv",
             "Peptide",
         ),
         GraphInfoForfile(
-            "Swiss-Prot search file with missed cleavage",
+            "het Swiss-Prot zoekbestand met missed cleavage",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv",
             "Peptide",
         ),
         GraphInfoForfile(
-            "swissprot search file without missed cleavage",
+            "het Swiss-Prot zoekbestand zonder missed cleavage",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv",
             "Peptide",
@@ -544,22 +544,22 @@ if __name__ == "__main__":
         ),
     ]
 
-    for configuration in search_time_graph_configurations:
-        with open(configuration.input_file_location) as fp:
-            data = []
-            for line in fp:
-                found, protein_size, search_time = line.split(";")
-                # only use the time information if there was a match.
-                # If we don't match the information is not representative since the mismatch could be after e.g. 1 character => fast, but also nothing that is useful
-                if found == "1":
-                    search_time = search_time.rstrip("\n")
-                    data.append((bool(found), int(protein_size), float(search_time)))
-            protein_search_distribution(
-                data,
-                configuration.bin_size,
-                configuration.short_name,
-                configuration.language,
-            )
-            create_heatmap_of_search_execution(
-                data, configuration.short_name, configuration.language
-            )
+    # for configuration in search_time_graph_configurations:
+    #     with open(configuration.input_file_location) as fp:
+    #         data = []
+    #         for line in fp:
+    #             found, protein_size, search_time = line.split(";")
+    #             # only use the time information if there was a match.
+    #             # If we don't match the information is not representative since the mismatch could be after e.g. 1 character => fast, but also nothing that is useful
+    #             if found == "1":
+    #                 search_time = search_time.rstrip("\n")
+    #                 data.append((bool(found), int(protein_size), float(search_time)))
+    #         protein_search_distribution(
+    #             data,
+    #             configuration.bin_size,
+    #             configuration.short_name,
+    #             configuration.language,
+    #         )
+    #         create_heatmap_of_search_execution(
+    #             data, configuration.short_name, configuration.language
+    #         )

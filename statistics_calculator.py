@@ -55,8 +55,8 @@ def output_statistics(rows: list[str]):
     maximum = get_sequence_statistic(rows, max)
     average = get_sequence_statistic(rows, avg)
     median = get_sequence_statistic(rows, med)
-    print(f"total length: {len(''.join(rows))}")
     print(f"file: {file.split('/')[-2:]}")
+    print(f"total length: {len(''.join(rows))}")
     print(f"number of sequences: {len(rows)}")
     print(f"minimum sequence length: {minimum}")
     print(f"maximum sequence length: {maximum}")
@@ -75,6 +75,12 @@ if __name__ == "__main__":
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/search_file.tsv",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S03.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S05.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S07.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S08.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S11.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S14.txt",
     ]
     for file in database_files:
         rows = read_tsv_file(file, FileType.DATABASE)
