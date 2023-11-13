@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from math import ceil
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,8 +20,14 @@ class ComparisonGraph:
     datasets: list[str] = field(
         default_factory=lambda: [
             "Human-Prot",
-            "Swiss-Prot without missed cleavage",
-            "Swiss-Prot with missed cleavage",
+            "Swiss-Prot zonder missed cleavage",
+            "Swiss-Prot met missed cleavage",
+            "SIHUMI S03",
+            "SIHUMI S05",
+            "SIHUMI S07",
+            "SIHUMI S08",
+            "SIHUMI S11",
+            "SIHUMI S14",
         ]
     )
 
@@ -52,10 +59,12 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.set_xlabel(data.x_as)
     ax.set_ylabel(data.y_as)
     ax.set_title(data.title)
+    ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
     ax.legend()
     ax.margins(0.1, 0.05)
-    plt.gcf().set_size_inches(12, 4)
+    height = 4 if len(data.datasets) == 2 else 8
+    plt.gcf().set_size_inches(12, height)
 
     if output_name is not None:
         plt.savefig(output_name)
@@ -85,21 +94,57 @@ if __name__ == "__main__":
     all_data = [
         ComparisonGraph(  # until match found
             {
-                "C++": [209.522, 170.814, 179.346],
-                "Rust": [226.07584635416666, 175.210205078125, 151.49943033854166],
+                "C++": [
+                    204.374,
+                    147.355,
+                    134.187,
+                    17.3605,
+                    16.7635,
+                    17.8944,
+                    17.6533,
+                    17.249,
+                    17.3359,
+                ],
+                "Rust": [
+                    219.67120659179687,
+                    152.98342421875,
+                    140.635694921875,
+                    17.862667626953126,
+                    17.937821044921876,
+                    17.9280654296875,
+                    18.086377294921874,
+                    17.827000048828126,
+                    18.37514921875,
+                ],
             },
             "Tijd in milliseconden om een match voor alle Peptiden te zoeken",
             "Tijd in milliseconden",
             "Zoekbestand",
         ),
-        ComparisonGraph(
+        ComparisonGraph(  # withs subtree
             {
                 "C++": [
                     1.45269e06,
                     1.57777e07,
                     1.54936e07,
+                    3.67146e06,
+                    3.67822e06,
+                    3.56324e06,
+                    3.60447e06,
+                    3.63128e06,
+                    3.65424e06,
                 ],
-                "Rust": [861712.7821858724, 287.7971191406, 210.38191731770834],
+                "Rust": [
+                    861712.7821858724,
+                    287.7971191406,
+                    210.38191731770834,
+                    41.4705810546875,
+                    37.624462890625,
+                    51.1537353515625,
+                    50.9006103515625,
+                    50.213818359375,
+                    35.260107421875,
+                ],
             },
             "Tijd in milliseconden om met doorzoeken van subboom alle Peptiden te zoeken",
             "Tijd in milliseconden",

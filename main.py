@@ -450,6 +450,42 @@ if __name__ == "__main__":
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv",
             "Peptide",
         ),
+        GraphInfoForfile(
+            "het SIHUMI SO3 zoekbestand",
+            [ProteinLengthGraphSettings(float("inf"), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S03.txt",
+            "Peptide",
+        ),
+        GraphInfoForfile(
+            "het SIHUMI SO5 zoekbestand",
+            [ProteinLengthGraphSettings(float("inf"), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S05.txt",
+            "Peptide",
+        ),
+        GraphInfoForfile(
+            "het SIHUMI SO7 zoekbestand",
+            [ProteinLengthGraphSettings(float("inf"), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S07.txt",
+            "Peptide",
+        ),
+        GraphInfoForfile(
+            "het SIHUMI SO8 zoekbestand",
+            [ProteinLengthGraphSettings(float("inf"), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S08.txt",
+            "Peptide",
+        ),
+        GraphInfoForfile(
+            "het SIHUMI S11 zoekbestand",
+            [ProteinLengthGraphSettings(float("inf"), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S11.txt",
+            "Peptide",
+        ),
+        GraphInfoForfile(
+            "het SIHUMI S14 zoekbestand",
+            [ProteinLengthGraphSettings(float("inf"), 5)],
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S14.txt",
+            "Peptide",
+        ),
     ]
 
     for graphInput in inputForGraphs:
