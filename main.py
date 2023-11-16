@@ -133,9 +133,9 @@ def create_barh_protein_length(
     create_barh(
         labels,
         counts,
-        f"{sequence_type} lengte",
+        f"{sequence_type}lengte",
         "Aantal voorkomens",
-        f"Verdeling van de {sequence_type.lower()} lengte voor {short_name}",
+        f"Verdeling van de {sequence_type.lower()}lengte voor {short_name}",
         output_file,
     )
 
