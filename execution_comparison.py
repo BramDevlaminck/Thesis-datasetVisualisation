@@ -82,13 +82,23 @@ if __name__ == "__main__":
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_ukkonen/TreeBuild/output_rust_swissprot_build.txt",
     ]
 
+    rust_array_build_time_files = [
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly/output_suffix_array_rust_immunopeptidomics_build.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly/output_suffix_array_rust_swissprot_build.txt",
+    ]
+
     # parse the files to extract the data
-    cpp_execution_data = [
+    cpp_tree_execution_data = [
         parse_and_aggregate_time_output_file(file) for file in cpp_tree_build_time_files
     ]
-    rust_execution_data = [
+    rust_tree_execution_data = [
         parse_and_aggregate_time_output_file(file)
         for file in rust_tree_build_time_files
+    ]
+
+    rust_array_execution_data = [
+        parse_and_aggregate_time_output_file(file)
+        for file in rust_array_build_time_files
     ]
 
     all_data = [
@@ -152,8 +162,10 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(
             {
-                "C++": [val.execution_time_seconds for val in cpp_execution_data],
-                "Rust": [val.execution_time_seconds for val in rust_execution_data],
+                "C++": [val.execution_time_seconds for val in cpp_tree_execution_data],
+                "Rust": [
+                    val.execution_time_seconds for val in rust_tree_execution_data
+                ],
             },
             "Tijd in seconden voor het opbouwen van de suffixboom via Ukkonen",
             "Tijd in seconden",
@@ -162,10 +174,96 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(
             {
-                "C++": [val.max_mem_size * 1e-6 for val in cpp_execution_data],
-                "Rust": [val.max_mem_size * 1e-6 for val in rust_execution_data],
+                "C++": [val.max_mem_size * 1e-6 for val in cpp_tree_execution_data],
+                "Rust": [val.max_mem_size * 1e-6 for val in rust_tree_execution_data],
             },
             "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de suffixboom via Ukkonen",
+            "Geheugengebruik in GB",
+            "Proteïne databank",
+            ["Human-Prot", "Swiss-Prot"],
+        ),
+        ComparisonGraph(  # until match found comparison between suffix tree and suffix array
+            {
+                "Suffixboom": [
+                    219.67120659179687,
+                    152.98342421875,
+                    140.635694921875,
+                    17.862667626953126,
+                    17.937821044921876,
+                    17.9280654296875,
+                    18.086377294921874,
+                    17.827000048828126,
+                    18.37514921875,
+                ],
+                "Suffix array": [
+                    459.671376953125,
+                    522.13283203125,
+                    383.06416748046877,
+                    92.2581396484375,
+                    88.7735302734375,
+                    91.50265380859375,
+                    92.354150390625,
+                    95.3837451171875,
+                    90.72038330078125,
+                ],
+            },
+            "Tijd in milliseconden om een match voor alle peptiden te zoeken",
+            "Tijd in milliseconden",
+            "Zoekbestand",
+        ),
+        ComparisonGraph(  # withs subtree
+            {
+                "Suffixboom": [
+                    861712.7821858724,
+                    287.7971191406,
+                    210.38191731770834,
+                    41.4705810546875,
+                    37.624462890625,
+                    51.1537353515625,
+                    50.9006103515625,
+                    50.213818359375,
+                    35.260107421875,
+                ],
+                "Suffix array": [
+                    73284.92388427735,
+                    625.5600708007812,
+                    461.5416577148437,
+                    99.98901611328125,
+                    96.99223388671875,
+                    108.72378662109375,
+                    109.3398388671875,
+                    109.3398388671875,
+                    100.088798828125,
+                ],
+            },
+            "Tijd in milliseconden om met doorzoeken van subboom alle peptiden te zoeken",
+            "Tijd in milliseconden",
+            "Zoekbestand",
+        ),
+        ComparisonGraph(
+            {
+                "Suffixboom": [
+                    val.execution_time_seconds for val in rust_tree_execution_data
+                ],
+                "Suffix array": [
+                    val.execution_time_seconds for val in rust_array_execution_data
+                ],
+            },
+            "Tijd in seconden voor het opbouwen van de indexstructuur in Rust",
+            "Tijd in seconden",
+            "Proteïne databank",
+            ["Human-Prot", "Swiss-Prot"],
+        ),
+        ComparisonGraph(
+            {
+                "Suffixboom": [
+                    val.max_mem_size * 1e-6 for val in rust_tree_execution_data
+                ],
+                "Suffix array": [
+                    val.max_mem_size * 1e-6 for val in rust_array_execution_data
+                ],
+            },
+            "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de indexstructuur in Rust",
             "Geheugengebruik in GB",
             "Proteïne databank",
             ["Human-Prot", "Swiss-Prot"],
