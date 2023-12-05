@@ -169,7 +169,7 @@ if __name__ == "__main__":
             },
             "Tijd in seconden voor het opbouwen van de suffixboom via Ukkonen",
             "Tijd in seconden",
-            "Proteïne databank",
+            "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
         ),
         ComparisonGraph(
@@ -179,7 +179,7 @@ if __name__ == "__main__":
             },
             "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de suffixboom via Ukkonen",
             "Geheugengebruik in GB",
-            "Proteïne databank",
+            "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
         ),
         ComparisonGraph(  # until match found comparison between suffix tree and suffix array
@@ -251,7 +251,7 @@ if __name__ == "__main__":
             },
             "Tijd in seconden voor het opbouwen van de indexstructuur in Rust",
             "Tijd in seconden",
-            "Proteïne databank",
+            "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
         ),
         ComparisonGraph(
@@ -265,7 +265,7 @@ if __name__ == "__main__":
             },
             "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de indexstructuur in Rust",
             "Geheugengebruik in GB",
-            "Proteïne databank",
+            "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
         ),
     ]
