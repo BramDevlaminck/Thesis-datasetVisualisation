@@ -236,7 +236,7 @@ if __name__ == "__main__":
                     100.088798828125,
                 ],
             },
-            "Tijd in milliseconden om met doorzoeken van subboom alle peptiden te zoeken",
+            "Tijd in milliseconden om all voorkomens te vinden waarmee een peptide matcht",
             "Tijd in milliseconden",
             "Zoekbestand",
         ),
