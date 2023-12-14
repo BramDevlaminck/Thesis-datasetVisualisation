@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from math import ceil
+from typing import Callable
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -9,6 +11,44 @@ from time_output_parser import parse_and_aggregate_time_output_file
 """File that generates grouped bar charts to compare the execution of different implementations"""
 
 colours = ["cadetblue", "blanchedalmond"]
+
+font = {"weight": "normal", "size": 15}
+
+# mpl.rc("font", **font)
+
+
+def time_formatter_ms(time_in_ms: float) -> str:
+    """aid function to transform a time in milliseconds into a string"""
+    hour_in_ms = 3600000
+    minute_in_ms = 60000
+    second_in_ms = 1000
+    hours = round(time_in_ms / hour_in_ms, 2)
+    if hours >= 1:
+        return f"{hours} h"
+    minutes = round(time_in_ms / minute_in_ms, 2)
+    if minutes >= 1:
+        return f"{minutes} min"
+    seconds = round(time_in_ms / second_in_ms, 2)
+    if seconds >= 1:
+        return f"{seconds} s"
+    time_in_ms = round(time_in_ms, 2)
+    return f"{time_in_ms} ms"
+
+
+def time_formatter_sec(time_in_sec: float) -> str:
+    """aid function to transform a time in seconds into a string"""
+    hour_in_ms = 3600
+    minute_in_ms = 60
+    second_in_ms = 1
+    hours = round(time_in_sec / hour_in_ms, 2)
+    if hours >= 1:
+        return f"{hours} h"
+    minutes = round(time_in_sec / minute_in_ms, 2)
+    if minutes >= 1:
+        return f"{minutes} min"
+    seconds = round(time_in_sec / second_in_ms, 2)
+    if seconds >= 1:
+        return f"{seconds} s"
 
 
 @dataclass
@@ -22,14 +62,15 @@ class ComparisonGraph:
             "Human-Prot",
             "Swiss-Prot zonder missed cleavage",
             "Swiss-Prot met missed cleavage",
-            "SIHUMI S03",
-            "SIHUMI S05",
-            "SIHUMI S07",
-            "SIHUMI S08",
-            "SIHUMI S11",
-            "SIHUMI S14",
+            "SIHUMI 03",
+            "SIHUMI 05",
+            "SIHUMI 07",
+            "SIHUMI 08",
+            "SIHUMI 11",
+            "SIHUMI 14",
         ]
     )
+    format_time: Callable[[float], str] | None = None
 
 
 def create_speed_comparison(data: ComparisonGraph, output_name: str | None = None):
@@ -51,7 +92,12 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
             edgecolor="black",
             alpha=0.7,
         )
-        ax.bar_label(bars, padding=3, labels=["{:.2f}".format(val) for val in values])
+
+        if data.format_time is not None:
+            labels = [data.format_time(val) for val in values]
+        else:
+            labels = ["{:.2f}".format(val) for val in values]
+        ax.bar_label(bars, padding=3, labels=labels)
         multiplier += 1
 
     ax.set_yticks(y_pos + width / 2, labels=data.datasets)
@@ -127,8 +173,8 @@ if __name__ == "__main__":
                     18.37514921875,
                 ],
             },
-            "Tijd in milliseconden om een match voor alle peptiden te zoeken",
-            "Tijd in milliseconden",
+            "Tijd (ms) om een match voor alle peptiden te zoeken",
+            "Tijd (ms)",
             "Zoekbestand",
         ),
         ComparisonGraph(  # withs subtree
@@ -156,9 +202,10 @@ if __name__ == "__main__":
                     35.260107421875,
                 ],
             },
-            "Tijd in milliseconden om met doorzoeken van subboom alle peptiden te zoeken",
-            "Tijd in milliseconden",
+            "Tijd (ms) om met doorzoeken van subboom alle peptiden te zoeken",
+            "Tijd (ms)",
             "Zoekbestand",
+            format_time=time_formatter_ms,
         ),
         ComparisonGraph(
             {
@@ -167,18 +214,19 @@ if __name__ == "__main__":
                     val.execution_time_seconds for val in rust_tree_execution_data
                 ],
             },
-            "Tijd in seconden voor het opbouwen van de suffixboom via Ukkonen",
-            "Tijd in seconden",
+            "Tijd (s) voor het opbouwen van de suffixboom via Ukkonen",
+            "Tijd (s)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
+            format_time=time_formatter_sec,
         ),
         ComparisonGraph(
             {
                 "C++": [val.max_mem_size * 1e-6 for val in cpp_tree_execution_data],
                 "Rust": [val.max_mem_size * 1e-6 for val in rust_tree_execution_data],
             },
-            "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de suffixboom via Ukkonen",
-            "Geheugengebruik in GB",
+            "Maximale gebruikte hoeveelheid geheugen (GB) voor het opbouwen van de suffixboom via Ukkonen",
+            "Geheugengebruik (GB)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
         ),
@@ -207,8 +255,8 @@ if __name__ == "__main__":
                     90.72038330078125,
                 ],
             },
-            "Tijd in milliseconden om een match voor alle peptiden te zoeken",
-            "Tijd in milliseconden",
+            "Tijd (ms) om een match voor alle peptiden te zoeken",
+            "Tijd (ms)",
             "Zoekbestand",
         ),
         ComparisonGraph(  # withs subtree
@@ -236,9 +284,10 @@ if __name__ == "__main__":
                     100.088798828125,
                 ],
             },
-            "Tijd in milliseconden om all voorkomens te vinden waarmee een peptide matcht",
-            "Tijd in milliseconden",
+            "Tijd (ms) om all voorkomens te vinden waarmee een peptide matcht",
+            "Tijd (ms)",
             "Zoekbestand",
+            format_time=time_formatter_ms,
         ),
         ComparisonGraph(
             {
@@ -249,10 +298,11 @@ if __name__ == "__main__":
                     val.execution_time_seconds for val in rust_array_execution_data
                 ],
             },
-            "Tijd in seconden voor het opbouwen van de indexstructuur in Rust",
-            "Tijd in seconden",
+            "Tijd (s) voor het opbouwen van de indexstructuur in Rust",
+            "Tijd (s)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
+            format_time=time_formatter_sec,
         ),
         ComparisonGraph(
             {
@@ -263,8 +313,8 @@ if __name__ == "__main__":
                     val.max_mem_size * 1e-6 for val in rust_array_execution_data
                 ],
             },
-            "Maximale gebruikte hoeveelheid geheugen in GB voor het opbouwen van de indexstructuur in Rust",
-            "Geheugengebruik in GB",
+            "Maximale gebruikte hoeveelheid geheugen (GB) voor het opbouwen van de indexstructuur in Rust",
+            "Geheugengebruik (GB)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
         ),
