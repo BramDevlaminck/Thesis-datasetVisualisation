@@ -104,7 +104,7 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel(data.x_as)
     ax.set_ylabel(data.y_as)
-    ax.set_title(data.title)
+    # ax.set_title(data.title)
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
     ax.legend()
@@ -175,7 +175,7 @@ if __name__ == "__main__":
             },
             "Tijd (ms) om een match voor alle peptiden te zoeken",
             "Tijd (ms)",
-            "Zoekbestand",
+            "Peptidebestand",
         ),
         ComparisonGraph(  # withs subtree
             {
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             },
             "Tijd (ms) om met doorzoeken van subboom alle peptiden te zoeken",
             "Tijd (ms)",
-            "Zoekbestand",
+            "Peptidebestand",
             format_time=time_formatter_ms,
         ),
         ComparisonGraph(
@@ -257,7 +257,7 @@ if __name__ == "__main__":
             },
             "Tijd (ms) om een match voor alle peptiden te zoeken",
             "Tijd (ms)",
-            "Zoekbestand",
+            "Peptidebestand",
         ),
         ComparisonGraph(  # withs subtree
             {
@@ -286,7 +286,7 @@ if __name__ == "__main__":
             },
             "Tijd (ms) om all voorkomens te vinden waarmee een peptide matcht",
             "Tijd (ms)",
-            "Zoekbestand",
+            "Peptidebestand",
             format_time=time_formatter_ms,
         ),
         ComparisonGraph(

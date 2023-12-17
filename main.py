@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from math import floor
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
@@ -18,11 +19,13 @@ def round_up(num_to_round: float, multiple_to_round_to: float) -> float:
     return round(num_to_round + multiple_to_round_to - remainder)
 
 
-def calculate_character_statistics(proteins: list[str]) -> list[str]:
+def calculate_character_statistics(proteins: list[str]) -> dict[str, int]:
     """Creates a list of all the individual characters of the proteins"""
-    statistiscs: list[str] = []
+    alphabet = "abcdefghijklmnopqrstuvwxyz".upper()
+    statistiscs: dict[str, int] = {letter: 0 for letter in alphabet}
     for line in proteins:
-        statistiscs += [*line]
+        for char in line:
+            statistiscs[char.upper()] += 1
 
     return statistiscs
 
@@ -61,10 +64,13 @@ def create_barh_acid_code_occurrences(
     """Creates a horizontal barchart of the distribution of the letters in the proteins"""
 
     statistics = calculate_character_statistics(proteins)
+    data_tuples = [(k, v) for k, v in statistics.items()]
+    data_tuples.sort(key=lambda x: x[0])
+    labels, counts = list(zip(*data_tuples))
     # counts for char in statistics how many times it occurred, the char will be places in labels (sorted alphabetically) and the count in counts
-    labels, counts = np.unique(statistics, return_counts=True)
+    # labels, counts = np.unique(statistics, return_counts=True)
     # some letters from the alphabet will not occur in this dataset, add them at the right place with count 0
-    labels, counts = make_alphabet_complete((list(labels), list(counts)))
+    # labels, counts = make_alphabet_complete((list(labels), list(counts)))
 
     create_barh(
         labels,
@@ -167,7 +173,7 @@ def create_barh(
     # Add labels and a title
     plt.ylabel(ylabel)
     plt.xlabel(x_label)
-    plt.title(title)
+    # plt.title(title)
 
     # Add a grid and set image size
     plt.grid(True, linestyle="--", alpha=0.5, axis="x")
@@ -176,6 +182,7 @@ def create_barh(
     image_height = 4 if len(labels) == 1 else 8.27
 
     plt.gcf().set_size_inches(11.69, image_height)
+    plt.tight_layout()
 
     if file_name is not None:
         plt.savefig(file_name)
@@ -420,7 +427,7 @@ if __name__ == "__main__":
                 ProteinLengthGraphSettings(float("inf"), 1000),
                 ProteinLengthGraphSettings(1000, 50),
             ],
-            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/protein_database.tsv",
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/humanprot/protein_database.tsv",
             "Proteïne",
         ),
         GraphInfoForfile(
@@ -433,55 +440,55 @@ if __name__ == "__main__":
             "Proteïne",
         ),
         GraphInfoForfile(
-            "het Human-Prot zoekbestand",
+            "het Human-Prot peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
-            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/search_file.tsv",
+            "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/humanprot/search_file.tsv",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het Swiss-Prot zoekbestand met missed cleavage",
+            "het Swiss-Prot peptidebestand met missed cleavage",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het Swiss-Prot zoekbestand zonder missed cleavage",
+            "het Swiss-Prot peptidebestand zonder missed cleavage",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het SIHUMI SO3 zoekbestand",
+            "het SIHUMI SO3 peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S03.txt",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het SIHUMI SO5 zoekbestand",
+            "het SIHUMI SO5 peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S05.txt",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het SIHUMI SO7 zoekbestand",
+            "het SIHUMI SO7 peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S07.txt",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het SIHUMI SO8 zoekbestand",
+            "het SIHUMI SO8 peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S08.txt",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het SIHUMI S11 zoekbestand",
+            "het SIHUMI S11 peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S11.txt",
             "Peptide",
         ),
         GraphInfoForfile(
-            "het SIHUMI S14 zoekbestand",
+            "het SIHUMI S14 peptidebestand",
             [ProteinLengthGraphSettings(float("inf"), 5)],
             "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S14.txt",
             "Peptide",
@@ -493,7 +500,7 @@ if __name__ == "__main__":
             data = []
             for line in fp:
                 data.append(line.split("\t")[-1].rstrip("\n"))
-
+            print(graphInput.input_file_location)
             create_barh_acid_code_occurrences(data, graphInput.short_name)
             # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
             for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:

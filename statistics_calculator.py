@@ -67,12 +67,12 @@ def output_statistics(rows: list[str]):
 
 if __name__ == "__main__":
     database_files = [
-        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/protein_database.tsv",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/humanprot/protein_database.tsv",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/protein_database.tsv",
     ]
 
     search_files = [
-        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/immunopeptidomics/search_file.tsv",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/humanprot/search_file.tsv",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var1/search_file_no_mch.tsv",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/swissprot_var2/search_file_mch.tsv",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/Dataset/BenchmarkData/SIHUMI/S03.txt",
