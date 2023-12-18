@@ -14,22 +14,30 @@ colours = ["cadetblue", "blanchedalmond"]
 
 font = {"weight": "normal", "size": 15}
 
-# mpl.rc("font", **font)
+mpl.rc("font", **font)
 
 
 def time_formatter_ms(time_in_ms: float) -> str:
-    """aid function to transform a time in milliseconds into a string"""
+    """
+    aid function to transform a time in milliseconds into a string
+
+    use >= 1.2 since we don't want to display 61 minutes as 1 hour,...
+    also show minutes when we are calculating in hours, otherwise only show the largest "unit"
+    """
     hour_in_ms = 3600000
     minute_in_ms = 60000
     second_in_ms = 1000
     hours = round(time_in_ms / hour_in_ms, 2)
-    if hours >= 1:
-        return f"{hours} h"
+    if hours >= 1.2:
+        hours = int(hours)
+        rest_min = int(round((time_in_ms - hours * hour_in_ms) / minute_in_ms, 0))
+        return f"{hours} h, {rest_min} min"
     minutes = round(time_in_ms / minute_in_ms, 2)
-    if minutes >= 1:
+    if minutes >= 1.2:
+        minutes = int(round(minutes, 0))
         return f"{minutes} min"
     seconds = round(time_in_ms / second_in_ms, 2)
-    if seconds >= 1:
+    if seconds >= 1.2:
         return f"{seconds} s"
     time_in_ms = round(time_in_ms, 2)
     return f"{time_in_ms} ms"
@@ -51,6 +59,11 @@ def time_formatter_sec(time_in_sec: float) -> str:
         return f"{seconds} s"
 
 
+def memory_formatter_gb(memory: float) -> str:
+    """aid function to return string but with 'GB' added to it"""
+    return f"{round(memory, 2)} GB"
+
+
 @dataclass
 class ComparisonGraph:
     data: dict[str, list[float]]
@@ -70,7 +83,7 @@ class ComparisonGraph:
             "SIHUMI 14",
         ]
     )
-    format_time: Callable[[float], str] | None = None
+    label_formatter: Callable[[float], str] | None = None
 
 
 def create_speed_comparison(data: ComparisonGraph, output_name: str | None = None):
@@ -93,8 +106,8 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
             alpha=0.7,
         )
 
-        if data.format_time is not None:
-            labels = [data.format_time(val) for val in values]
+        if data.label_formatter is not None:
+            labels = [data.label_formatter(val) for val in values]
         else:
             labels = ["{:.2f}".format(val) for val in values]
         ax.bar_label(bars, padding=3, labels=labels)
@@ -103,14 +116,14 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.set_yticks(y_pos + width / 2, labels=data.datasets)
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel(data.x_as)
-    ax.set_ylabel(data.y_as)
-    # ax.set_title(data.title)
+    # ax.set_ylabel(data.y_as)
+    ax.set_title(data.title)
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
     ax.legend()
     ax.margins(0.1, 0.05)
     height = 4 if len(data.datasets) == 2 else 8
-    plt.gcf().set_size_inches(12, height)
+    plt.gcf().set_size_inches(15.2, height)
 
     if output_name is not None:
         plt.savefig(output_name)
@@ -205,7 +218,7 @@ if __name__ == "__main__":
             "Tijd (ms) om met doorzoeken van subboom alle peptiden te zoeken",
             "Tijd (ms)",
             "Peptidebestand",
-            format_time=time_formatter_ms,
+            label_formatter=time_formatter_ms,
         ),
         ComparisonGraph(
             {
@@ -218,7 +231,7 @@ if __name__ == "__main__":
             "Tijd (s)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
-            format_time=time_formatter_sec,
+            label_formatter=time_formatter_sec,
         ),
         ComparisonGraph(
             {
@@ -229,6 +242,7 @@ if __name__ == "__main__":
             "Geheugengebruik (GB)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
         ),
         ComparisonGraph(  # until match found comparison between suffix tree and suffix array
             {
@@ -287,7 +301,7 @@ if __name__ == "__main__":
             "Tijd (ms) om all voorkomens te vinden waarmee een peptide matcht",
             "Tijd (ms)",
             "Peptidebestand",
-            format_time=time_formatter_ms,
+            label_formatter=time_formatter_ms,
         ),
         ComparisonGraph(
             {
@@ -302,7 +316,7 @@ if __name__ == "__main__":
             "Tijd (s)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
-            format_time=time_formatter_sec,
+            label_formatter=time_formatter_sec,
         ),
         ComparisonGraph(
             {
@@ -317,6 +331,7 @@ if __name__ == "__main__":
             "Geheugengebruik (GB)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
         ),
     ]
 
