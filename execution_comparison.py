@@ -120,6 +120,7 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.set_title(data.title)
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
+    # ax.legend(loc="lower right")
     ax.legend()
     ax.margins(0.1, 0.05)
     height = 4 if len(data.datasets) == 2 else 8
@@ -189,6 +190,7 @@ if __name__ == "__main__":
             "Tijd (ms) om een match voor alle peptiden te zoeken",
             "Tijd (ms)",
             "Peptidebestand",
+            label_formatter=time_formatter_ms,
         ),
         ComparisonGraph(  # withs subtree
             {
@@ -272,6 +274,7 @@ if __name__ == "__main__":
             "Tijd (ms) om een match voor alle peptiden te zoeken",
             "Tijd (ms)",
             "Peptidebestand",
+            label_formatter=time_formatter_ms,
         ),
         ComparisonGraph(  # withs subtree
             {
@@ -331,6 +334,42 @@ if __name__ == "__main__":
             "Geheugengebruik (GB)",
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
+        ),
+        # grafiek die de R-index en suffix array vergelijkt tijdens het opbouwen, ZONDER mapping van tekst naar proteïne of taxon informatie
+        ComparisonGraph(
+            {
+                "R-index": [11.648724, 19.594848, 33.090360, 87.313960, 110.846824],
+                "Suffix array": [4.167052, 8.158876, 16.130820, 32.423844, 40.800236],
+            },
+            "Maximale gebruikte hoeveelheid geheugen (GB) voor het opbouwen van de indexstructuur",
+            "Geheugengebruik (GB)",
+            "Proteïnedatabank",
+            ["0.5%", "1%", "2%", "4%", "5%"],
+            label_formatter=memory_formatter_gb,
+        ),
+        # grafiek die de R-index en suffix array vergelijkt tijdens het opbouwen, ZONDER mapping van tekst naar proteïne of taxon informatie
+        ComparisonGraph(
+            {
+                "R-index": [
+                    1.954170576,
+                    3.320975480,
+                    5.624046578,
+                    15.798992742,
+                    20.087319696,
+                ],
+                "Suffix array": [
+                    3.837553812,
+                    7.516684503,
+                    14.863689414,
+                    29.87913753,
+                    37.598805144,
+                ],
+            },
+            "Indexgrootte na opbouwen in GB",
+            "Geheugengebruik (GB)",
+            "Proteïnedatabank",
+            ["0.5%", "1%", "2%", "4%", "5%"],
             label_formatter=memory_formatter_gb,
         ),
     ]
