@@ -10,7 +10,7 @@ from time_output_parser import parse_and_aggregate_time_output_file
 
 """File that generates grouped bar charts to compare the execution of different implementations"""
 
-colours = ["cadetblue", "blanchedalmond"]
+colours = ["cadetblue", "blanchedalmond", "lightcoral"]
 
 font = {"weight": "normal", "size": 15}
 
@@ -35,7 +35,11 @@ def time_formatter_ms(time_in_ms: float) -> str:
     minutes = round(time_in_ms / minute_in_ms, 2)
     if minutes >= 1.2:
         minutes = int(round(minutes, 0))
-        return f"{minutes} min"
+        res = f"{minutes} min"
+        seconds = int(round((time_in_ms - minutes * minute_in_ms) / second_in_ms, 0))
+        if minutes < 10:
+            res += f", {seconds} s"
+        return res
     seconds = round(time_in_ms / second_in_ms, 2)
     if seconds >= 1.2:
         return f"{seconds} s"
@@ -90,8 +94,8 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     fig, ax = plt.subplots(layout="constrained")
     y_pos = np.arange(len(data.datasets))
 
-    width = (
-        1 / 3
+    width = 1 / (
+        len(data.data) + 1
     )  # the width of the bars (divide by 1 bigger than the number of algorithms we are comparing!)
     multiplier = 0
     for i, (key, values) in enumerate(data.data.items()):
@@ -113,10 +117,10 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
         ax.bar_label(bars, padding=3, labels=labels)
         multiplier += 1
 
-    ax.set_yticks(y_pos + width / 2, labels=data.datasets)
+    ax.set_yticks(y_pos + width * len(data.data) / 2 - width / 2, labels=data.datasets)
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel(data.x_as)
-    # ax.set_ylabel(data.y_as)
+    ax.set_ylabel(data.y_as)
     ax.set_title(data.title)
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
@@ -371,6 +375,60 @@ if __name__ == "__main__":
             "Proteïnedatabank",
             ["0.5%", "1%", "2%", "4%", "5%"],
             label_formatter=memory_formatter_gb,
+        ),
+        # results for swissprot + no missed cleavage file zoektijden + DENSE mapping van suffix naar protein
+        ComparisonGraph(
+            {
+                "Match": [
+                    396.708173828125,
+                    637.1782958984375,
+                    814.3014501953126,
+                    1071.4788232421874,
+                    2390.039921875,
+                ],
+                "All occurrences": [
+                    503.968720703125,
+                    900.22390625,
+                    1826.64822265625,
+                    9463.048955078126,
+                    133851.62409179687,
+                ],
+                "Find LCA": [
+                    3524.2559912109373,
+                    3948.636240234375,
+                    4941.030161132812,
+                    12628.776108398437,
+                    135133.98046875,
+                ],
+            },
+            "Zoektijd Swiss-Prot zonder missed cleavages (dense mapping van suffix naar proteïne)",
+            "Tijd (ms)",
+            "Sample factor",
+            ["1", "2", "3", "4", "5"],
+            label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            {
+                "Dense": [
+                    3524.2559912109373,
+                    3948.636240234375,
+                    4941.030161132812,
+                    12628.776108398437,
+                    # 135133.98046875,
+                ],
+                "Sparse": [
+                    3680.764990234375,
+                    4154.237607421875,
+                    5239.153872070313,
+                    13705.790971679688,
+                ],
+            },
+            "Zoektijd naar LCA (taxon id) voor dense vs sparse mapping voor verschillende sample factors",
+            "Tijd (ms)",
+            "Sample factor",
+            ["1", "2", "3", "4"],
+            # ["1", "2", "3", "4", "5"],
+            label_formatter=time_formatter_ms,
         ),
     ]
 
