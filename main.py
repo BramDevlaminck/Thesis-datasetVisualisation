@@ -232,6 +232,43 @@ def protein_search_distribution(
     )
 
 
+def create_search_time_distribution(searchResults: list[tuple[bool, int, float]]):
+    detail_range = list(range(5, 11))
+    min_detailed_value = detail_range[0]
+    max_detailed_value = detail_range[-1]
+    list_num_occurrences = [0 for _ in range(len(detail_range) + 1)]
+    list_total_time_for_group = [0 for _ in range(len(detail_range) + 1)]
+    for found, prot_size, search_time in searchResults:
+        # determine the group
+        index = -1
+        if prot_size <= max_detailed_value:
+            index = prot_size - min_detailed_value
+        # add value to the appropriate group
+        list_num_occurrences[index] += 1
+        list_total_time_for_group[index] += search_time
+
+    for index, occ in enumerate(list_num_occurrences):
+        list_total_time_for_group[index] /= occ
+
+    labels = [str(val) for val in detail_range]
+    labels.append(f"{labels[-1]}+")
+    create_barh(
+        labels=labels,
+        counts=list_total_time_for_group,
+        x_label="Time (ms)",
+        ylabel="peptide length",
+        title="test",
+    )
+
+    create_barh(
+        labels=labels,
+        counts=list_num_occurrences,
+        x_label="Number of occurrences",
+        ylabel="peptide length",
+        title="test",
+    )
+
+
 @dataclass
 class ProteinLengthGraphSettings:
     max_allowed_length: float
@@ -495,22 +532,22 @@ if __name__ == "__main__":
         ),
     ]
 
-    for graphInput in inputForGraphs:
-        with open(graphInput.input_file_location) as fp:
-            data = []
-            for line in fp:
-                data.append(line.split("\t")[-1].rstrip("\n"))
-            print(graphInput.input_file_location)
-            create_barh_acid_code_occurrences(data, graphInput.short_name)
-            # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
-            for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
-                create_barh_protein_length(
-                    data,
-                    proteinLengthGraphSetting.bin_size,
-                    graphInput.short_name,
-                    proteinLengthGraphSetting.max_allowed_length,
-                    graphInput.sequence_type,
-                )
+    # for graphInput in inputForGraphs:
+    #     with open(graphInput.input_file_location) as fp:
+    #         data = []
+    #         for line in fp:
+    #             data.append(line.split("\t")[-1].rstrip("\n"))
+    #         print(graphInput.input_file_location)
+    #         create_barh_acid_code_occurrences(data, graphInput.short_name)
+    #         # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
+    #         for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
+    #             create_barh_protein_length(
+    #                 data,
+    #                 proteinLengthGraphSetting.bin_size,
+    #                 graphInput.short_name,
+    #                 proteinLengthGraphSetting.max_allowed_length,
+    #                 graphInput.sequence_type,
+    #             )
 
     search_time_graph_configurations = [
         ConfigurationForSearchTimeGraphs(
@@ -606,3 +643,22 @@ if __name__ == "__main__":
     #         create_heatmap_of_search_execution(
     #             data, configuration.short_name, configuration.language
     #         )
+
+    sparse_files = [
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/SparseSuffixArrays/swissprot_var1_sample_factor1_avg10.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/SparseSuffixArrays/swissprot_var1_sample_factor2_avg10.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/SparseSuffixArrays/swissprot_var1_sample_factor3_avg10.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/SparseSuffixArrays/swissprot_var1_sample_factor4_avg10.txt",
+    ]
+
+    for file in sparse_files:
+        with open(file) as fp:
+            data = []
+            for line in fp:
+                found, protein_size, search_time = line.split(";")
+                # only use the time information if there was a match.
+                # If we don't match the information is not representative since the mismatch could be after e.g. 1 character => fast, but also nothing that is useful
+                if found == "1":
+                    search_time = search_time.rstrip("\n")
+                    data.append((bool(found), int(protein_size), float(search_time)))
+            create_search_time_distribution(data)
