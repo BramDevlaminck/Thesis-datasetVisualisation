@@ -1,7 +1,9 @@
+import math
 from dataclasses import dataclass
 from math import floor
 
 import matplotlib as mpl
+import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
@@ -456,6 +458,60 @@ def create_heatmap_of_search_execution(
     plt.show()
 
 
+def create_2d_heatmap(data: list[tuple[int, int, float]]):
+    # TODO: filter away tuples with size bigger than x
+    max_shown_prot_size = 54
+    max_matches = max(v[1] for v in data)
+    occ_bucket_size = int(math.ceil(max_matches / 100))  # we want 100 buckets
+    image = [[0 for _ in range(100)] for _ in range(50)]
+
+    # TODO: count for each interval in the square how many times it occurs and show it as an image
+    buckets_used = 0
+    for size, occ, _ in data:
+        if size <= max_shown_prot_size:
+            size_bucket = size - 5  # - 5 since the min value is 5
+            occ_bucket = occ // occ_bucket_size
+            buckets_used = max(buckets_used, occ_bucket)
+            image[size_bucket][occ_bucket] += 1
+    print(max_matches)
+
+    cur_min = float("inf")
+    cur_max = float("-inf")
+    for row in image:
+        for val in row:
+            if val < cur_min:
+                cur_min = val
+            if val > cur_max:
+                cur_max = val
+    fig, ax = plt.subplots()
+
+    # set 0 values to NaN to be displayed as white in the image
+    for i, row in enumerate(image):
+        for j, val in enumerate(row):
+            if val == 0:
+                image[i][j] = np.NAN
+
+    hist = ax.imshow(
+        image,
+        interpolation="none",
+        cmap="cividis",
+    )
+    x_tick_labels = [0, 500000, 1000000, 1500000, 2000000]
+    x_ticks = [label / max_matches * 100 for label in x_tick_labels]
+    ax.set_xticks(
+        x_ticks, labels=[f"{label:,}".replace(",", ".") for label in x_tick_labels]
+    )
+    y_ticks = [0, 10, 20, 30, 40]
+    ax.set_yticks(y_ticks, labels=[str(v + 5) for v in y_ticks])
+    fig.colorbar(hist)
+    ax.set_ylabel("Peptide length")
+    ax.set_xlabel("Number of matching proteins")
+    ax.set_title(
+        "Distribution of number of matches in Uniprot\nfor the Swiss-Prot peptide file\n without missed cleavages"
+    )
+    plt.show()
+
+
 if __name__ == "__main__":
     inputForGraphs = [
         GraphInfoForfile(
@@ -651,14 +707,27 @@ if __name__ == "__main__":
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/SparseSuffixArrays/swissprot_var1_sample_factor4_avg10.txt",
     ]
 
-    for file in sparse_files:
-        with open(file) as fp:
-            data = []
-            for line in fp:
-                found, protein_size, search_time = line.split(";")
-                # only use the time information if there was a match.
-                # If we don't match the information is not representative since the mismatch could be after e.g. 1 character => fast, but also nothing that is useful
-                if found == "1":
-                    search_time = search_time.rstrip("\n")
-                    data.append((bool(found), int(protein_size), float(search_time)))
-            create_search_time_distribution(data)
+    # for file in sparse_files:
+    #     with open(file) as fp:
+    #         data = []
+    #         for line in fp:
+    #             found, protein_size, search_time = line.split(";")
+    #             # only use the time information if there was a match.
+    #             # If we don't match the information is not representative since the mismatch could be after e.g. 1 character => fast, but also nothing that is useful
+    #             if found == "1":
+    #                 search_time = search_time.rstrip("\n")
+    #                 data.append((bool(found), int(protein_size), float(search_time)))
+    #         create_search_time_distribution(data)
+
+    with open(
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/OccurrencesPerLengthUniprot/uniprot_searchtime_all_occ_count.txt"
+    ) as fp:
+        data = []
+        for line in fp:
+            protein_size, num_matches, search_time = line.split(";")
+            protein_size = int(protein_size)
+            num_matches = int(num_matches)
+            search_time = float(search_time)
+            data.append((protein_size, num_matches, search_time))
+
+        create_2d_heatmap(data)
