@@ -147,8 +147,8 @@ if __name__ == "__main__":
     ]
 
     rust_array_build_time_files = [
-        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly/output_suffix_array_rust_immunopeptidomics_build.txt",
-        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly/output_suffix_array_rust_swissprot_build.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly_libdivsufsort/output_suffix_array_rust_immunopeptidomics_build.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly_libdivsufsort/output_suffix_array_rust_swissprot_build.txt",
     ]
 
     # parse the files to extract the data
@@ -407,27 +407,64 @@ if __name__ == "__main__":
             ["1", "2", "3", "4", "5"],
             label_formatter=time_formatter_ms,
         ),
-        ComparisonGraph(
+        ComparisonGraph(  # swissprot + no missed cleavage file zoektijden
             {
                 "Dense": [
                     3524.2559912109373,
                     3948.636240234375,
                     4941.030161132812,
                     12628.776108398437,
-                    # 135133.98046875,
+                    135133.98046875,
                 ],
                 "Sparse": [
                     3680.764990234375,
                     4154.237607421875,
                     5239.153872070313,
                     13705.790971679688,
+                    144266.00616210938,
                 ],
             },
             "Zoektijd naar LCA (taxon id) voor dense vs sparse mapping voor verschillende sample factors",
             "Tijd (ms)",
             "Sample factor",
-            ["1", "2", "3", "4"],
-            # ["1", "2", "3", "4", "5"],
+            ["1", "2", "3", "4", "5"],
+            label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            {
+                "Manueel aanmaken van threads": [
+                    28953.89794921875,
+                    15479.1708984375,
+                    10773.0380859375,
+                    7757.5771484375,
+                    6313.8115234375,
+                    5045.465576171875,
+                    4561.252685546875,
+                    4009.536865234375,
+                    3693.316650390625,
+                    3283.839599609375,
+                    2954.5703125,
+                    2681.176025390625,
+                ],
+                "Threading m.b.v. Rayon ": [
+                    25481.59521484375,
+                    13808.319580078125,
+                    9103.64990234375,
+                    6982.69580078125,
+                    5301.76708984375,
+                    4554.90966796875,
+                    3817.50537109375,
+                    3413.670654296875,
+                    3035.99169921875,
+                    2764.484375,
+                    2505.06689453125,
+                    2333.380615234375,
+                ],
+            },
+            "Tijd om de LCA* van het Swiss-Prot peptidebestand zonder missed cleavage te zoeken in 5% van UniProt",
+            "Tijd (ms)",
+            "Aantal threads",
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             label_formatter=time_formatter_ms,
         ),
     ]
