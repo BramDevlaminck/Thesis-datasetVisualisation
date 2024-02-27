@@ -146,9 +146,14 @@ if __name__ == "__main__":
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_ukkonen/TreeBuild/output_rust_swissprot_build.txt",
     ]
 
-    rust_array_build_time_files = [
+    rust_array_libdivsufsort_build_time_files = [
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly_libdivsufsort/output_suffix_array_rust_immunopeptidomics_build.txt",
         "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly_libdivsufsort/output_suffix_array_rust_swissprot_build.txt",
+    ]
+
+    rust_array_libsais_build_time_files = [
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly_libsais/output_suffix_array_rust_immunopeptidomics_build.txt",
+        "/Users/brdvlami/Documents/Ugent/MA2/Thesis/BenchmarkResults/Rust_suffix_array/BuildOnly_libsais/output_suffix_array_rust_swissprot_build.txt",
     ]
 
     # parse the files to extract the data
@@ -160,9 +165,14 @@ if __name__ == "__main__":
         for file in rust_tree_build_time_files
     ]
 
-    rust_array_execution_data = [
+    rust_array_libdivsufsort_execution_data = [
         parse_and_aggregate_time_output_file(file)
-        for file in rust_array_build_time_files
+        for file in rust_array_libdivsufsort_build_time_files
+    ]
+
+    rust_array_libsais_execution_data = [
+        parse_and_aggregate_time_output_file(file)
+        for file in rust_array_libsais_build_time_files
     ]
 
     all_data = [
@@ -316,7 +326,8 @@ if __name__ == "__main__":
                     val.execution_time_seconds for val in rust_tree_execution_data
                 ],
                 "Suffix array": [
-                    val.execution_time_seconds for val in rust_array_execution_data
+                    val.execution_time_seconds
+                    for val in rust_array_libdivsufsort_execution_data
                 ],
             },
             "Tijd (s) voor het opbouwen van de indexstructuur in Rust",
@@ -331,7 +342,8 @@ if __name__ == "__main__":
                     val.max_mem_size * 1e-6 for val in rust_tree_execution_data
                 ],
                 "Suffix array": [
-                    val.max_mem_size * 1e-6 for val in rust_array_execution_data
+                    val.max_mem_size * 1e-6
+                    for val in rust_array_libdivsufsort_execution_data
                 ],
             },
             "Maximale gebruikte hoeveelheid geheugen (GB) voor het opbouwen van de indexstructuur in Rust",
@@ -466,6 +478,70 @@ if __name__ == "__main__":
             "Aantal threads",
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            {
+                "Suffix array (libsais)": [
+                    val.execution_time_seconds
+                    for val in rust_array_libsais_execution_data
+                ],
+                "Suffixboom (Rust)": [
+                    val.execution_time_seconds for val in rust_tree_execution_data
+                ],
+            },
+            "Tijd (s) voor het opbouwen van de indexstructuur",
+            "Tijd (s)",
+            "Proteïnedatabank",
+            ["Human-Prot", "Swiss-Prot"],
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(
+            {
+                "Suffix array (libsais)": [
+                    val.max_mem_size * 1e-6 for val in rust_array_libsais_execution_data
+                ],
+                "Suffixboom (Rust)": [
+                    val.max_mem_size * 1e-6 for val in rust_tree_execution_data
+                ],
+            },
+            "Maximale gebruikte hoeveelheid geheugen (GB) voor het opbouwen van de indexstructuur",
+            "Geheugengebruik (GB)",
+            "Proteïnedatabank",
+            ["Human-Prot", "Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(
+            {
+                "Suffix array (libsais)": [
+                    val.execution_time_seconds
+                    for val in rust_array_libsais_execution_data
+                ],
+                "Suffix array (libdivsufsort)": [
+                    val.execution_time_seconds
+                    for val in rust_array_libdivsufsort_execution_data
+                ],
+            },
+            "Tijd (s) voor het opbouwen van de indexstructuur",
+            "Tijd (s)",
+            "Proteïnedatabank",
+            ["Human-Prot", "Swiss-Prot"],
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(
+            {
+                "Suffix array (libsais)": [
+                    val.max_mem_size * 1e-6 for val in rust_array_libsais_execution_data
+                ],
+                "Suffix array (libdivsufsort)": [
+                    val.max_mem_size * 1e-6
+                    for val in rust_array_libdivsufsort_execution_data
+                ],
+            },
+            "Maximale gebruikte hoeveelheid geheugen (GB) voor het opbouwen van de indexstructuur",
+            "Geheugengebruik (GB)",
+            "Proteïnedatabank",
+            ["Human-Prot", "Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
         ),
     ]
 
