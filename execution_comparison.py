@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from math import ceil
+from math import ceil, floor
 from typing import Callable
 
 import matplotlib as mpl
@@ -10,7 +10,7 @@ from time_output_parser import parse_and_aggregate_time_output_file
 
 """File that generates grouped bar charts to compare the execution of different implementations"""
 
-colours = ["cadetblue", "blanchedalmond", "lightcoral"]
+colours = ["cadetblue", "blanchedalmond", "lightcoral", "darkseagreen", "thistle"]
 
 font = {"weight": "normal", "size": 15}
 
@@ -34,7 +34,7 @@ def time_formatter_ms(time_in_ms: float) -> str:
         return f"{hours} h, {rest_min} min"
     minutes = round(time_in_ms / minute_in_ms, 2)
     if minutes >= 1.2:
-        minutes = int(round(minutes, 0))
+        minutes = int(floor(minutes))
         res = f"{minutes} min"
         seconds = int(round((time_in_ms - minutes * minute_in_ms) / second_in_ms, 0))
         if minutes < 10:
@@ -120,12 +120,11 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.set_yticks(y_pos + width * len(data.data) / 2 - width / 2, labels=data.datasets)
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel(data.x_as)
-    ax.set_ylabel(data.y_as)
-    ax.set_title(data.title)
+    # ax.set_ylabel(data.y_as)
+    # ax.set_title(data.title)
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
-    # ax.legend(loc="lower right")
-    ax.legend()
+    ax.legend(loc="lower right")
     ax.margins(0.1, 0.05)
     height = 4 if len(data.datasets) == 2 else 8
     plt.gcf().set_size_inches(15.2, height)
@@ -542,6 +541,104 @@ if __name__ == "__main__":
             "Proteïnedatabank",
             ["Human-Prot", "Swiss-Prot"],
             label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(  # suffixboom (met lca voorberekend) vs suffixarray (met lca*), met cutoff op 10000 matches voor de SA
+            {
+                "Suffixboom": [
+                    219.67120659179687,
+                    152.98342421875,
+                    140.635694921875,
+                    17.862667626953126,
+                    17.937821044921876,
+                    17.9280654296875,
+                    18.086377294921874,
+                    17.827000048828126,
+                    18.37514921875,
+                ],
+                "Suffix array 1 thread (niet sparse)": [
+                    1750.2314453125,
+                    924.6883544921875,
+                    727.555029296875,
+                    159.974169921875,
+                    159.2865478515625,
+                    178.650390625,
+                    183.7022705078125,
+                    184.5429931640625,
+                    153.8831787109375,
+                ],
+                "Suffix array 12 threads (niet sparse)": [
+                    417.0977783203125,
+                    185.4984375,
+                    173.9829833984375,
+                    40.562841796875,
+                    44.768310546875,
+                    42.59638671875,
+                    43.5115966796875,
+                    42.554638671875,
+                    40.7529541015625,
+                ],
+            },
+            "Tijd (ms) om het geaggregeerde taxon ID te vinden voor elke peptide met cutoff op 10000 matches",
+            "Tijd (ms)",
+            "Peptidebestand",
+            label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            # suffixboom (met lca voorberekend) vs suffixarray (met lca*), zonder cutoff voor de SA
+            {
+                "Suffixboom": [
+                    219.67120659179687,
+                    152.98342421875,
+                    140.635694921875,
+                    17.862667626953126,
+                    17.937821044921876,
+                    17.9280654296875,
+                    18.086377294921874,
+                    17.827000048828126,
+                    18.37514921875,
+                ],
+                "Suffix array 1 thread (niet sparse)": [
+                    572101.4310058594,
+                    947.8179931640625,
+                    729.418505859375,
+                    160.544873046875,
+                    162.6793212890625,
+                    178.7932373046875,
+                    184.179833984375,
+                    187.9348876953125,
+                    151.7920654296875,
+                ],
+                "Suffix array 12 threads (niet sparse)": [
+                    163968.31882324218,
+                    193.1651611328125,
+                    188.2863037109375,
+                    40.9485595703125,
+                    42.1366455078125,
+                    42.0172119140625,
+                    42.5451904296875,
+                    42.07587890625,
+                    39.64833984375,
+                ],
+            },
+            "Tijd (ms) om het geaggregeerde taxon ID te vinden voor elke peptide zonder cutoff",
+            "Tijd (ms)",
+            "Peptidebestand",
+            label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            # evolutie van zoektijd naar taxonid (1 tread)
+            {
+                "sparseness factor 1": [910.463134765625, 717.8666015625],
+                "sparseness factor 2": [1409.4352783203126, 1054.492822265625],
+                "sparseness factor 3": [2553.0102783203124, 1568.374853515625],
+                "sparseness factor 4": [11808.8814453125, 4321.583813476563],
+                "sparseness factor 5": [155939.5229003906, 48842.2990234375],
+            },
+            "Tijd (ms) om het geaggregeerde taxon ID te vinden voor elke peptide zonder cutoff",
+            "Tijd (ms)",
+            "Peptidebestand",
+            ["Swiss-Prot zonder missed cleavages", "Swiss-Prot met missed cleavages"],
+            label_formatter=time_formatter_ms,
         ),
     ]
 
