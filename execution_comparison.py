@@ -740,7 +740,7 @@ if __name__ == "__main__":
             ],
             label_formatter=memory_formatter_gb,
         ),
-        ComparisonGraph(  # dit gaat over swissprot
+        ComparisonGraph(  # zoektijd in volledige Uniprot database
             {
                 "Standaard zoeken": [
                     58.5436666666667,
