@@ -61,7 +61,7 @@ def create_relative_comparison(
     # ax.set_title(data.title)
     ax.set_xticks(np.arange(min(data.datasets), max(data.datasets) + 1, 1.0))
     ax.grid(color="lightgray", linestyle="-", linewidth=1)
-    ax.legend(loc="lower right")
+    ax.legend()
     ax.margins(0.1, 0.05)
     height = 3 if len(data.datasets) == 2 else 6
     plt.gcf().set_size_inches(10, height)
@@ -125,7 +125,32 @@ if __name__ == "__main__":
             "Aantal threads",
             "Relatieve versnelling",
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        )
+        ),
+        ComparisonLineGraph(  # dit gaat over swissprot
+            {
+                "SA grootte (zonder tekst)": (
+                    "solid",
+                    [1.652189544, 0.826094776, 0.550729848, 0.413047392, 0.330437912],
+                ),
+                "Index grootte (SA + tekst)": (
+                    "solid",
+                    [
+                        val + 0.206523693
+                        for val in [
+                            1.652189544,
+                            0.826094776,
+                            0.550729848,
+                            0.413047392,
+                            0.330437912,
+                        ]
+                    ],
+                ),
+            },
+            "Grootte van de indexstructuur voor verschillende sparseness factoren",
+            "sparseness factor",
+            "SSA grootte (GB)",
+            [1, 2, 3, 4, 5],
+        ),
     ]
 
     for graph in data:

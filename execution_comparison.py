@@ -125,6 +125,7 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
     ax.legend(loc="lower right")
+    # ax.legend()
     ax.margins(0.1, 0.05)
     height = 4 if len(data.datasets) == 2 else 8
     plt.gcf().set_size_inches(15.2, height)
@@ -542,7 +543,8 @@ if __name__ == "__main__":
             ["Human-Prot", "Swiss-Prot"],
             label_formatter=memory_formatter_gb,
         ),
-        ComparisonGraph(  # suffixboom (met lca voorberekend) vs suffixarray (met lca*), met cutoff op 10000 matches voor de SA
+        ComparisonGraph(
+            # suffixboom (met lca voorberekend) vs suffixarray (met lca*), met cutoff op 10000 matches voor de SA
             {
                 "Suffixboom": [
                     219.67120659179687,
@@ -555,7 +557,7 @@ if __name__ == "__main__":
                     17.827000048828126,
                     18.37514921875,
                 ],
-                "Suffix array 1 thread (niet sparse)": [
+                "Suffix array 1 thread (sparseness factor 1)": [
                     1750.2314453125,
                     924.6883544921875,
                     727.555029296875,
@@ -566,7 +568,7 @@ if __name__ == "__main__":
                     184.5429931640625,
                     153.8831787109375,
                 ],
-                "Suffix array 12 threads (niet sparse)": [
+                "Suffix array 12 threads (sparseness factor 1)": [
                     417.0977783203125,
                     185.4984375,
                     173.9829833984375,
@@ -597,7 +599,7 @@ if __name__ == "__main__":
                     17.827000048828126,
                     18.37514921875,
                 ],
-                "Suffix array 1 thread (niet sparse)": [
+                "Suffix array 1 thread (sparseness factor 1)": [
                     572101.4310058594,
                     947.8179931640625,
                     729.418505859375,
@@ -608,7 +610,7 @@ if __name__ == "__main__":
                     187.9348876953125,
                     151.7920654296875,
                 ],
-                "Suffix array 12 threads (niet sparse)": [
+                "Suffix array 12 threads (sparseness factor 1)": [
                     163968.31882324218,
                     193.1651611328125,
                     188.2863037109375,
@@ -640,7 +642,194 @@ if __name__ == "__main__":
             ["Swiss-Prot zonder missed cleavages", "Swiss-Prot met missed cleavages"],
             label_formatter=time_formatter_ms,
         ),
+        ComparisonGraph(
+            {
+                "Dense": [
+                    52261.39501953125,
+                    379.025146484375,
+                    291.041015625,
+                    61.3359375,
+                    60.760009765625,
+                    65.18994140625,
+                    68.41796875,
+                    66.320068359375,
+                    66.740966796875,
+                ],
+                "Sparse": [
+                    182869.44775390625,
+                    331.035888671875,
+                    270.232177734375,
+                    72.0390625,
+                    64.677978515625,
+                    65.0830078125,
+                    75.007080078125,
+                    74.037109375,
+                    66.64599609375,
+                ],
+            },
+            "Tijd (ms) om alle voorkomens te vinden gebruik makende van een dense of sparse mapping van suffix naar proteïne",
+            "Tijd (ms)",
+            "Peptidebestand",
+            label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            {
+                "Dense": [
+                    val * 1e-9
+                    for val in [
+                        1208909824,
+                        3357868032,
+                        3221602304,
+                        3326017536,
+                        3307388928,
+                        3249684480,
+                        3317972992,
+                        3317022720,
+                        3260497920,
+                    ]
+                ],
+                "Sparse": [
+                    val * 1e-9
+                    for val in [
+                        1035321344,
+                        2491056128,
+                        2501902336,
+                        2567421952,
+                        2594766848,
+                        2501951488,
+                        2498560000,
+                        2498691072,
+                        2591326208,
+                    ]
+                ],
+            },
+            "Geheugen (GB) om alle voorkomens te vinden gebruik makende van een dense of sparse mapping van suffix naar proteïne",
+            "Geheugen (GB)",
+            "Peptidebestand",
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(  # dit gaat over swissprot
+            {
+                "SA grootte (zonder tekst)": [
+                    1.652189544,
+                    0.826094776,
+                    0.550729848,
+                    0.413047392,
+                    0.330437912,
+                ],
+                "Index grootte (SA + tekst)": [
+                    val + 0.206523693
+                    for val in [
+                        1.652189544,
+                        0.826094776,
+                        0.550729848,
+                        0.413047392,
+                        0.330437912,
+                    ]
+                ],
+            },
+            "Grootte van de indexstructuur voor verschillende sparseness factoren",
+            "Grootte (GB)",
+            "Sparseness factor",
+            [
+                "sparseness factor 1",
+                "sparseness factor 2",
+                "sparseness factor 3",
+                "sparseness factor 4",
+                "sparseness factor 5",
+            ],
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(  # dit gaat over swissprot
+            {
+                "Standaard zoeken": [
+                    85.698,
+                    23.9133333333333,
+                    1.9925,
+                    1.7813333333,
+                    3.046,
+                    5.801,
+                    4.353,
+                    1.796,
+                ],
+                "Zoeken met I en L gelijkgesteld": [
+                    103.06666666667,
+                    24.294,
+                    4.8796666666667,
+                    4.2696666666667,
+                    6.283,
+                    9.1523333333333,
+                    8.2953333333333,
+                    4.4906666666667,
+                ],
+            },
+            "Tijd (in s) om peptides te zoeken in UniProtKB",
+            "Tijd (s)",
+            "",
+            [
+                "Swiss-Prot zonder missed cleavage",
+                "Swiss-Prot met missed cleavage",
+                "SIHUMI 03",
+                "SIHUMI 05",
+                "SIHUMI 07",
+                "SIHUMI 08",
+                "SIHUMI 11",
+                "SIHUMI 14",
+            ],
+            label_formatter=time_formatter_sec,
+        ),
     ]
+
+    libsais_build_time_uniprot = [
+        31883639.763671875,
+        35007841.790771484,
+        34330708.56616211,
+        27523439.407958984,
+        29120545.077392578,
+        27644291.99584961,
+    ]
+
+    libdivsufsort_build_time_uniprot = [
+        17697356.158203125,
+        16287824.045898438,
+        18641389.829833984,
+        18943567.30859375,
+        18042967.510253906,
+        19415305.08618164,
+    ]
+
+    all_data.extend(
+        [
+            ComparisonGraph(  # graph with execution time for building uniprot
+                {
+                    "Libdivsufsort": [
+                        sum(libdivsufsort_build_time_uniprot)
+                        / len(libdivsufsort_build_time_uniprot)
+                    ],
+                    "Libsais": [
+                        sum(libsais_build_time_uniprot)
+                        / len(libsais_build_time_uniprot)
+                    ],
+                },
+                "Tijd (ms) om de suffixarray op te bouwen voor UniProtKB",
+                "Tijd (ms)",
+                "",
+                [""],
+                label_formatter=time_formatter_ms,
+            ),
+            ComparisonGraph(
+                {
+                    "Libdivsufsort": [734.47],
+                    "Libsais": [731.10],
+                },
+                "Geheugengebruik (GB) om de suffixarray op te bouwen voor UniProtKB",
+                "Geheugengebruik (GB)",
+                "",
+                [""],
+                label_formatter=memory_formatter_gb,
+            ),
+        ]
+    )
 
     for data in all_data:
         create_speed_comparison(data)
