@@ -743,6 +743,7 @@ if __name__ == "__main__":
         ComparisonGraph(  # dit gaat over swissprot
             {
                 "Standaard zoeken": [
+                    58.5436666666667,
                     85.698,
                     23.9133333333333,
                     1.9925,
@@ -753,6 +754,7 @@ if __name__ == "__main__":
                     1.796,
                 ],
                 "Zoeken met I en L gelijkgesteld": [
+                    68.9836666667,
                     103.06666666667,
                     24.294,
                     4.8796666666667,
@@ -766,16 +768,6 @@ if __name__ == "__main__":
             "Tijd (in s) om peptides te zoeken in UniProtKB",
             "Tijd (s)",
             "",
-            [
-                "Swiss-Prot zonder missed cleavage",
-                "Swiss-Prot met missed cleavage",
-                "SIHUMI 03",
-                "SIHUMI 05",
-                "SIHUMI 07",
-                "SIHUMI 08",
-                "SIHUMI 11",
-                "SIHUMI 14",
-            ],
             label_formatter=time_formatter_sec,
         ),
     ]
