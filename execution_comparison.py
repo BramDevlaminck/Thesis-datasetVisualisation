@@ -740,7 +740,7 @@ if __name__ == "__main__":
             ],
             label_formatter=memory_formatter_gb,
         ),
-        ComparisonGraph(  # zoektijd in volledige Uniprot database
+        ComparisonGraph(  # zoektijd in volledige Uniprot database, dit is in de index waar we I en L apart houden, en dan via een boom proberen zoeken naar waar ze gelijk zijn
             {
                 "Standaard zoeken": [
                     58.5436666666667,
@@ -763,6 +763,36 @@ if __name__ == "__main__":
                     9.1523333333333,
                     8.2953333333333,
                     4.4906666666667,
+                ],
+            },
+            "Tijd (in s) om peptides te zoeken in UniProtKB",
+            "Tijd (s)",
+            "",
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(  # zoektijd in volledige Uniprot database, dit is door I en L in de index gelijk te stellen, en als ze dit niet zijn achteraf te filteren
+            {
+                "Standaard zoeken": [
+                    54.257,
+                    72.1886666667,
+                    17.221,
+                    2.014,
+                    1.661,
+                    2.9173333333333,
+                    4.781,
+                    3.809,
+                    1.7293333333333,
+                ],
+                "Zoeken met I en L gelijkgesteld": [
+                    50.577,
+                    58.9803333333333,
+                    15.9306666666667,
+                    3.118,
+                    2.8753333333333,
+                    4.088,
+                    6.0046666666667,
+                    5.1613333333333,
+                    2.824,
                 ],
             },
             "Tijd (in s) om peptides te zoeken in UniProtKB",
