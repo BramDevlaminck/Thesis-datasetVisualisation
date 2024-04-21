@@ -124,10 +124,10 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     # ax.set_title(data.title)
     ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
 
-    ax.legend(loc="lower right")
+    ax.legend(loc="upper right")
     # ax.legend()
     ax.margins(0.1, 0.05)
-    height = 4 if len(data.datasets) == 2 else 8
+    height = 2.4 if len(data.datasets) <= 2 else 8
     plt.gcf().set_size_inches(15.2, height)
 
     if output_name is not None:
@@ -742,7 +742,7 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(  # zoektijd in volledige Uniprot database, dit is in de index waar we I en L apart houden, en dan via een boom proberen zoeken naar waar ze gelijk zijn
             {
-                "Standaard zoeken": [
+                "Zoeken I = L": [
                     58.5436666666667,
                     85.698,
                     23.9133333333333,
@@ -753,7 +753,7 @@ if __name__ == "__main__":
                     4.353,
                     1.796,
                 ],
-                "Zoeken met I en L gelijkgesteld": [
+                "Zoeken I ≠ L": [
                     68.9836666667,
                     103.06666666667,
                     24.294,
@@ -772,7 +772,7 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(  # zoektijd in volledige Uniprot database, dit is door I en L in de index gelijk te stellen, en als ze dit niet zijn achteraf te filteren
             {
-                "Standaard zoeken": [
+                "Zoeken I = L": [
                     54.257,
                     72.1886666667,
                     17.221,
@@ -783,7 +783,7 @@ if __name__ == "__main__":
                     3.809,
                     1.7293333333333,
                 ],
-                "Zoeken met I en L gelijkgesteld": [
+                "Zoeken I ≠ L": [
                     50.577,
                     58.9803333333333,
                     15.9306666666667,
@@ -799,6 +799,128 @@ if __name__ == "__main__":
             "Tijd (s)",
             "",
             label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(
+            # grafiek voor de les computationele biologie, oude unipept op swissprot vs suffixtree
+            {
+                "Huidige Unipept index": [132, 1537],
+                "Suffixboom": [0.15298, 0.14064],
+            },
+            "",
+            "Tijd (s)",
+            "",
+            ["zonder missed cleavages", "met missed cleavages"],
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(
+            # voor de les computationele biologie, oude unipept op swissprot vs suffixtree
+            {
+                "Huidige Unipept index": [6.7],
+                "Suffixboom": [85],
+            },
+            "",
+            "Geheugengebruik (GB)",
+            "Proteïnedatabank",
+            ["Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(
+            # voor de les computationele biologie, huidige uniprot vs suffixboom vs suffix array
+            {
+                "Huidige Unipept index": [6.7],
+                "Suffixboom": [85],
+                "Suffix array": [2.64],
+            },
+            "",
+            "Geheugengebruik (GB)",
+            "Proteïnedatabank",
+            ["Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(
+            # voor de les computationele biologie, huidige uniprot vs suffixboom vs suffix array
+            {
+                "Suffixboom": [152.98, 140.64],
+                "Suffix array": [947.82, 729.42],
+            },
+            "",
+            "Tijd (ms)",
+            "Proteïnedatabank",
+            ["zonder missed cleavages", "met missed cleavages"],
+            label_formatter=time_formatter_ms,
+        ),
+        ComparisonGraph(
+            # voor de les computationele biologie, huidige uniprot vs suffixboom vs suffix array
+            {
+                "Suffix array": [59, 16],
+            },
+            "",
+            "Tijd (s)",
+            "Proteïnedatabank",
+            ["zonder missed cleavages", "met missed cleavages"],
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(  # dit gaat over uniprotKB
+            {
+                "SA grootte (zonder tekst)": [705.62, 352.81, 235.21, 176.40, 141.124],
+                "Index grootte (SA + tekst)": [
+                    val + 87.055 for val in [705.62, 352.81, 235.21, 176.40, 141.124]
+                ],
+            },
+            "Grootte van de indexstructuur voor verschillende sparseness factoren",
+            "Grootte (GB)",
+            "Sparseness factor",
+            [
+                "k = 1",
+                "k = 2",
+                "k = 3",
+                "k = 4",
+                "k = 5",
+            ],
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(  # dit gaat over 5%, 10%,... van uniprot
+            {
+                "Suffix array opbouwen": [
+                    4.167052,
+                    8.158876,
+                    16.130820,
+                    32.423844,
+                    40.800236,
+                ],
+                "R-index opbouwen": [
+                    11.648724,
+                    19.594848,
+                    33.090360,
+                    87.313960,
+                    110.846824,
+                ],
+                "Suffix array index (SA + tekst)": [
+                    3.837553812,
+                    7.516684503,
+                    14.863689414,
+                    29.87913753,
+                    37.598805144,
+                ],
+                "R-index index": [
+                    1.954170576,
+                    3.320975480,
+                    5.624046578,
+                    15.798992742,
+                    20.087319696,
+                ],
+            },
+            "Grootte van de suffix array en R-index voor verschillende databanken",
+            "Grootte (GB)",
+            "Eiwitdatabank",
+            [
+                "0.5%",
+                "1%",
+                "2%",
+                "4%",
+                "5%",
+            ],
+            label_formatter=memory_formatter_gb,
         ),
     ]
 
