@@ -11,10 +11,11 @@ mpl.rc("font", **font)
 colours = [
     "cadetblue",
     "blanchedalmond",
+    "RosyBrown",
+    "darkseagreen",
+    "SlateGray",
     "lightcoral",
     "thistle",
-    "darkseagreen",
-    "peru",
 ]
 
 
@@ -32,23 +33,23 @@ def create_treemap():
     # Create a data frame with fake data
     df = pd.DataFrame(
         {
-            "nb_people": [235.21, 88.2, 10.55, 8.4, 2, 2],
+            "nb_people": [235.21, 88.2, 0.6, 2, 2, 10.55, 8.4],
             "group": [
                 "Sparse suffix array\n(sparseness factor 3)\n(235 GB)",
-                "tekst\n(Proteïne sequenties)\n(88 GB)",
-                "Functionele\nannotaties\n(10.5 GB)",
-                "UniProt\naccessions\n(8.4 GB)",
+                "Tekst\n(Proteïne sequenties)\n(88 GB)",
+                "NCBI taxonomy aggregator (0.6 GB)",
                 "Taxonomische annotaties (2 GB)",
                 "Suffix → proteïne (2 GB)",
+                "Functionele\nannotaties\n(10.5 GB)",
+                "UniProt\naccession\nnumbers\n(8.4 GB)",
             ],
         }
     )
 
     num_labels_in_legend = 2
-    labels = df["group"]
-    labels_on_plot = list(labels[:-num_labels_in_legend]) + [
-        "" for _ in range(num_labels_in_legend)
-    ]
+    labels = list(df["group"])
+    labels_on_plot = labels[:2] + ["" for _ in range(3)] + labels[5:]
+    print(labels_on_plot)
     # plot it
     ax = squarify.plot(
         sizes=df["nb_people"],
@@ -57,13 +58,33 @@ def create_treemap():
         alpha=0.8,
     )
     plt.axis("off")
-    plt.legend(
-        handles=ax.containers[0][len(labels) - num_labels_in_legend :],
-        labels=list(labels[len(labels) - num_labels_in_legend :]),
-        handlelength=1,
-        handleheight=1,
-    )
     plt.gcf().set_size_inches(15.2, 8)
+
+    plt.annotate(
+        "Suffix → proteïne (2 GB)",
+        xy=(70.8, 95.3),
+        fontsize=15,
+        xytext=(49.5, 94.5),
+        arrowprops=dict(facecolor="black", width=0.8, headwidth=8),
+        color="black",
+    )
+    plt.annotate(
+        "Taxonomische annotaties (2 GB)",
+        xy=(70.8, 86.3),
+        fontsize=15,
+        xytext=(43.65, 85.5),
+        arrowprops=dict(facecolor="black", width=0.8, headwidth=8),
+        color="black",
+    )
+    plt.annotate(
+        "NCBI taxonomy aggregator (0.6 GB)",
+        xy=(70.8, 80.3),
+        fontsize=15,
+        xytext=(40.9, 79.5),
+        arrowprops=dict(facecolor="black", width=0.8, headwidth=8),
+        color="black",
+    )
+    plt.text(0, 101, "Totale index (346.5 GB)", fontsize=15, color="black")
     plt.tight_layout()
 
     plt.show()
