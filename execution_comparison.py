@@ -586,7 +586,7 @@ if __name__ == "__main__":
             label_formatter=time_formatter_ms,
         ),
         ComparisonGraph(
-            # suffixboom (met lca voorberekend) vs suffixarray (met lca*), zonder cutoff voor de SA
+            # suffixboom (met lca voorberekend) vs suffixarray (met lca*), zonder cutoff voor de SA, de SA heeft altijd sparseness factor 1
             {
                 "Suffixboom": [
                     219.67120659179687,
@@ -599,7 +599,7 @@ if __name__ == "__main__":
                     17.827000048828126,
                     18.37514921875,
                 ],
-                "Suffix array 1 thread (sparseness factor 1)": [
+                "Suffix array 1 thread": [
                     572101.4310058594,
                     947.8179931640625,
                     729.418505859375,
@@ -610,7 +610,7 @@ if __name__ == "__main__":
                     187.9348876953125,
                     151.7920654296875,
                 ],
-                "Suffix array 12 threads (sparseness factor 1)": [
+                "Suffix array 12 threads": [
                     163968.31882324218,
                     193.1651611328125,
                     188.2863037109375,
@@ -881,36 +881,22 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(  # dit gaat over 5%, 10%,... van uniprot
             {
-                "Suffix array opbouwen": [
+                "Suffix array": [
                     4.167052,
                     8.158876,
                     16.130820,
                     32.423844,
                     40.800236,
                 ],
-                "R-index opbouwen": [
+                "R-index": [
                     11.648724,
                     19.594848,
                     33.090360,
                     87.313960,
                     110.846824,
                 ],
-                "Suffix array index (SA + tekst)": [
-                    3.837553812,
-                    7.516684503,
-                    14.863689414,
-                    29.87913753,
-                    37.598805144,
-                ],
-                "R-index index": [
-                    1.954170576,
-                    3.320975480,
-                    5.624046578,
-                    15.798992742,
-                    20.087319696,
-                ],
             },
-            "Grootte van de suffix array en R-index voor verschillende databanken",
+            "Maximaal geheugengebruik tijdens het opbouwen van de suffix array en R-index voor verschillende databanken",
             "Grootte (GB)",
             "Eiwitdatabank",
             [
@@ -921,6 +907,69 @@ if __name__ == "__main__":
                 "5%",
             ],
             label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(  # dit gaat over 5%, 10%,... van uniprot
+            {
+                "Suffix array (SA + tekst)": [
+                    3.837553812,
+                    7.516684503,
+                    14.863689414,
+                    29.87913753,
+                    37.598805144,
+                ],
+                "R-index": [
+                    1.954170576,
+                    3.320975480,
+                    5.624046578,
+                    15.798992742,
+                    20.087319696,
+                ],
+            },
+            "Grootte van de resulterende suffix array en R-index voor verschillende databanken",
+            "Grootte (GB)",
+            "Eiwitdatabank",
+            [
+                "0.5%",
+                "1%",
+                "2%",
+                "4%",
+                "5%",
+            ],
+            label_formatter=memory_formatter_gb,
+        ),
+        ComparisonGraph(
+            {
+                "New Unipept (I ≠ L)": [
+                    3.2986666667,
+                    3.1353333333,
+                    5.1593333333,
+                    8.08333333333,
+                    7.5296666667,
+                    4.05066666667,
+                ],
+                "New Unipept (I = L)": [
+                    8.05,
+                    6.9283333333,
+                    9.979,
+                    13.7416666666667,
+                    11.9933333333333,
+                    6.716,
+                ],
+                "Old Unipept (I ≠ L)": [230, 185, 435, 216, 610, 101],
+                "Old Unipept (I = L)": [
+                    165,
+                    123,
+                    464,
+                    330,
+                    845,
+                    84,
+                ],  # TODO: redo when unipept cache again clear?
+            },
+            "Tijd (s) voor het opbouwen van de indexstructuur",
+            "Time (s)",
+            "Proteïnedatabank",
+            ["S03", "S05", "S07", "S08", "S11", "S14"],
+            label_formatter=time_formatter_sec,
         ),
     ]
 
