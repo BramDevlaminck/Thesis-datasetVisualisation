@@ -12,7 +12,7 @@ from time_output_parser import parse_and_aggregate_time_output_file
 
 colours = ["cadetblue", "blanchedalmond", "lightcoral", "darkseagreen", "thistle"]
 
-font = {"weight": "normal", "size": 15}
+font = {"weight": "normal", "size": 21}
 
 mpl.rc("font", **font)
 
@@ -122,13 +122,13 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.set_xlabel(data.x_as)
     # ax.set_ylabel(data.y_as)
     # ax.set_title(data.title)
-    ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.14))
+    ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.21))
 
     ax.legend(loc="upper right")
     # ax.legend()
     ax.margins(0.1, 0.05)
-    height = 2.4 if len(data.datasets) <= 2 else 8
-    plt.gcf().set_size_inches(15.2, height)
+    height = 2.4 if len(data.datasets) <= 2 else 15
+    plt.gcf().set_size_inches(10, height)
 
     if output_name is not None:
         plt.savefig(output_name)
@@ -937,7 +937,7 @@ if __name__ == "__main__":
             ],
             label_formatter=memory_formatter_gb,
         ),
-        ComparisonGraph(
+        ComparisonGraph(  # font size 21, width 10, height 15, x_limit factor 1.21
             {
                 "New Unipept (I ≠ L)": [
                     3.2986666667,
@@ -957,8 +957,8 @@ if __name__ == "__main__":
                 ],
                 "Old Unipept (I ≠ L)": [230, 185, 435, 216, 610, 101],
                 "Old Unipept (I = L)": [
-                    165,
-                    123,
+                    190,
+                    143,
                     464,
                     330,
                     845,
