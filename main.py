@@ -532,22 +532,22 @@ if __name__ == "__main__":
         ),
     ]
 
-    # for graphInput in inputForGraphs:
-    #     with open(graphInput.input_file_location) as fp:
-    #         data = []
-    #         for line in fp:
-    #             data.append(line.split("\t")[-1].rstrip("\n"))
-    #         print(graphInput.input_file_location)
-    #         create_barh_acid_code_occurrences(data, graphInput.short_name)
-    #         # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
-    #         for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
-    #             create_barh_protein_length(
-    #                 data,
-    #                 proteinLengthGraphSetting.bin_size,
-    #                 graphInput.short_name,
-    #                 proteinLengthGraphSetting.max_allowed_length,
-    #                 graphInput.sequence_type,
-    #             )
+    for graphInput in inputForGraphs:
+        with open(graphInput.input_file_location) as fp:
+            data = []
+            for line in fp:
+                data.append(line.split("\t")[-1].rstrip("\n"))
+            print(graphInput.input_file_location)
+            create_barh_acid_code_occurrences(data, graphInput.short_name)
+            # do this in a loop since we can provide mutliple max-value and bin_size combinations to provide a better view
+            for proteinLengthGraphSetting in graphInput.proteinLengthGraphSettings:
+                create_barh_protein_length(
+                    data,
+                    proteinLengthGraphSetting.bin_size,
+                    graphInput.short_name,
+                    proteinLengthGraphSetting.max_allowed_length,
+                    graphInput.sequence_type,
+                )
 
     search_time_graph_configurations = [
         ConfigurationForSearchTimeGraphs(

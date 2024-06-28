@@ -29,7 +29,7 @@ def time_formatter_ms(time_in_ms: float) -> str:
     second_in_ms = 1000
     hours = round(time_in_ms / hour_in_ms, 2)
     if hours >= 1.2:
-        hours = int(hours)
+        hours = int(floor(hours))
         rest_min = int(round((time_in_ms - hours * hour_in_ms) / minute_in_ms, 0))
         return f"{hours} h, {rest_min} min"
     minutes = round(time_in_ms / minute_in_ms, 2)
@@ -49,16 +49,23 @@ def time_formatter_ms(time_in_ms: float) -> str:
 
 def time_formatter_sec(time_in_sec: float) -> str:
     """aid function to transform a time in seconds into a string"""
-    hour_in_ms = 3600
-    minute_in_ms = 60
-    second_in_ms = 1
-    hours = round(time_in_sec / hour_in_ms, 2)
+    hour_in_sec = 3600
+    minute_in_sec = 60
+    second_in_sec = 1
+    hours = round(time_in_sec / hour_in_sec, 2)
     if hours >= 1:
-        return f"{hours} h"
-    minutes = round(time_in_sec / minute_in_ms, 2)
+        hours = int(floor(hours))
+        rest_min = int(round((time_in_sec - hours * hour_in_sec) / minute_in_sec, 0))
+        return f"{hours} h, {rest_min} min"
+    minutes = round(time_in_sec / minute_in_sec, 2)
     if minutes >= 1:
-        return f"{minutes} min"
-    seconds = round(time_in_sec / second_in_ms, 2)
+        minutes = int(floor(minutes))
+        res = f"{minutes} min"
+        seconds = int(round((time_in_sec - minutes * minute_in_sec) / second_in_sec, 0))
+        # if minutes < 10:
+        res += f", {seconds} s"
+        return res
+    seconds = round(time_in_sec / second_in_sec, 2)
     if seconds >= 1:
         return f"{seconds} s"
 
@@ -77,8 +84,8 @@ class ComparisonGraph:
     datasets: list[str] = field(
         default_factory=lambda: [
             "Human-Prot",
-            "Swiss-Prot zonder missed cleavage",
-            "Swiss-Prot met missed cleavage",
+            "Swiss-Prot tryptisch",
+            "Swiss-Prot missed cleavage",
             "SIHUMI 03",
             "SIHUMI 05",
             "SIHUMI 07",
@@ -121,14 +128,14 @@ def create_speed_comparison(data: ComparisonGraph, output_name: str | None = Non
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel(data.x_as)
     # ax.set_ylabel(data.y_as)
-    # ax.set_title(data.title)
-    ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.21))
+    ax.set_title(data.title)
+    ax.set_xlim(right=ceil(max(np.array(list(data.data.values())).flatten()) * 1.10))
 
-    ax.legend(loc="upper right")
+    ax.legend(loc="lower right")
     # ax.legend()
     ax.margins(0.1, 0.05)
-    height = 2.4 if len(data.datasets) <= 2 else 15
-    plt.gcf().set_size_inches(10, height)
+    height = 4.5 if len(data.datasets) <= 2 else 15
+    plt.gcf().set_size_inches(20, height)
 
     if output_name is not None:
         plt.savefig(output_name)
@@ -557,7 +564,7 @@ if __name__ == "__main__":
                     17.827000048828126,
                     18.37514921875,
                 ],
-                "Suffix array 1 thread (sparseness factor 1)": [
+                "Suffix array 1 thread (k = 1)": [
                     1750.2314453125,
                     924.6883544921875,
                     727.555029296875,
@@ -568,7 +575,7 @@ if __name__ == "__main__":
                     184.5429931640625,
                     153.8831787109375,
                 ],
-                "Suffix array 12 threads (sparseness factor 1)": [
+                "Suffix array 12 threads (k = 1)": [
                     417.0977783203125,
                     185.4984375,
                     173.9829833984375,
@@ -580,7 +587,7 @@ if __name__ == "__main__":
                     40.7529541015625,
                 ],
             },
-            "Tijd (ms) om het geaggregeerde taxon ID te vinden voor elke peptide met cutoff op 10000 matches",
+            "Tijd (ms) voor zoeken + taxonomische analyse\nvoor elke peptide met cutoff op 10000 matches",
             "Tijd (ms)",
             "Peptidebestand",
             label_formatter=time_formatter_ms,
@@ -630,16 +637,16 @@ if __name__ == "__main__":
         ComparisonGraph(
             # evolutie van zoektijd naar taxonid (1 tread)
             {
-                "sparseness factor 1": [910.463134765625, 717.8666015625],
-                "sparseness factor 2": [1409.4352783203126, 1054.492822265625],
-                "sparseness factor 3": [2553.0102783203124, 1568.374853515625],
-                "sparseness factor 4": [11808.8814453125, 4321.583813476563],
-                "sparseness factor 5": [155939.5229003906, 48842.2990234375],
+                "k = 1": [910.463134765625, 717.8666015625],
+                "k = 2": [1409.4352783203126, 1054.492822265625],
+                "k = 3": [2553.0102783203124, 1568.374853515625],
+                "k = 4": [11808.8814453125, 4321.583813476563],
+                "k = 5": [155939.5229003906, 48842.2990234375],
             },
             "Tijd (ms) om het geaggregeerde taxon ID te vinden voor elke peptide zonder cutoff",
             "Tijd (ms)",
             "Peptidebestand",
-            ["Swiss-Prot zonder missed cleavages", "Swiss-Prot met missed cleavages"],
+            ["Swiss-Prot tryptisch", "Swiss-Prot missed cleavages"],
             label_formatter=time_formatter_ms,
         ),
         ComparisonGraph(
@@ -708,6 +715,29 @@ if __name__ == "__main__":
             "Peptidebestand",
             label_formatter=memory_formatter_gb,
         ),
+        ComparisonGraph(
+            {
+                "Dense": [
+                    val * 1e-9
+                    for val in [
+                        1208909824,
+                        3294756864,
+                    ]
+                ],
+                "Sparse": [
+                    val * 1e-9
+                    for val in [
+                        1035321344,
+                        2530709504,
+                    ]
+                ],
+            },
+            "Geheugen (GB) gebruik tijdens het zoeken in de Human-Prot of Swiss-Prot databank voor de sparse en dense mapping",
+            "Geheugen (GB)",
+            "Peptidebestand",
+            ["Human-prot", "Swiss-Prot"],
+            label_formatter=memory_formatter_gb,
+        ),
         ComparisonGraph(  # dit gaat over swissprot
             {
                 "SA grootte (zonder tekst)": [
@@ -728,7 +758,7 @@ if __name__ == "__main__":
                     ]
                 ],
             },
-            "Grootte van de indexstructuur voor verschillende sparseness factoren",
+            "Grootte van de indexstructuur (GB) voor verschillende sparseness factoren",
             "Grootte (GB)",
             "Sparseness factor",
             [
@@ -867,7 +897,7 @@ if __name__ == "__main__":
                     val + 87.055 for val in [705.62, 352.81, 235.21, 176.40, 141.124]
                 ],
             },
-            "Grootte van de indexstructuur voor verschillende sparseness factoren",
+            "Grootte van de indexstructuur (GB) voor verschillende sparseness factoren",
             "Grootte (GB)",
             "Sparseness factor",
             [
@@ -898,7 +928,7 @@ if __name__ == "__main__":
             },
             "Maximaal geheugengebruik tijdens het opbouwen van de suffix array en R-index voor verschillende databanken",
             "Grootte (GB)",
-            "Eiwitdatabank",
+            "Fractie van UniProtKB",
             [
                 "0.5%",
                 "1%",
@@ -927,7 +957,7 @@ if __name__ == "__main__":
             },
             "Grootte van de resulterende suffix array en R-index voor verschillende databanken",
             "Grootte (GB)",
-            "Eiwitdatabank",
+            "Fractie van UniProtKB",
             [
                 "0.5%",
                 "1%",
@@ -939,7 +969,7 @@ if __name__ == "__main__":
         ),
         ComparisonGraph(  # font size 21, width 10, height 15, x_limit factor 1.21
             {
-                "New Unipept (I ≠ L)": [
+                "Unipept 6.x (I ≠ L)": [
                     3.2986666667,
                     3.1353333333,
                     5.1593333333,
@@ -947,7 +977,7 @@ if __name__ == "__main__":
                     7.5296666667,
                     4.05066666667,
                 ],
-                "New Unipept (I = L)": [
+                "Unipept 6.x (I = L)": [
                     8.05,
                     6.9283333333,
                     9.979,
@@ -955,20 +985,86 @@ if __name__ == "__main__":
                     11.9933333333333,
                     6.716,
                 ],
-                "Old Unipept (I ≠ L)": [230, 185, 435, 216, 610, 101],
-                "Old Unipept (I = L)": [
-                    190,
+                "Unipept 5.x (I ≠ L)": [230, 185, 435, 216, 610, 101],
+                "Unipept 5.x (I = L)": [
+                    202,
                     143,
                     464,
                     330,
                     845,
                     84,
-                ],  # TODO: redo when unipept cache again clear?
+                ],
             },
-            "Tijd (s) voor het opbouwen van de indexstructuur",
+            "Tijd (s) nodig voor het verwerken van een peptidebestand\nmet missed cleavage handling",
             "Time (s)",
             "Proteïnedatabank",
-            ["S03", "S05", "S07", "S08", "S11", "S14"],
+            [
+                "SIHUMI 03",
+                "SIHUMI 05",
+                "SIHUMI 07",
+                "SIHUMI 08",
+                "SIHUMI 11",
+                "SIHUMI 14",
+            ],
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(  # font size 21, width 10, height 15, x_limit factor 1.21
+            {
+                "Unipept 6.x": [145.66, 115.81],
+                "Unipept 5.x": [93, 110],
+                # "New Unipept (I ≠ L)": [
+                #     145.66,
+                # ],
+                # "New Unipept (I = L)": [
+                #     115.81,
+                # ],
+                # "Old Unipept (I ≠ L)": [93],
+                # "Old Unipept (I = L)": [
+                #     110
+                # ],
+            },
+            "Tijd (s) nodig voor het verwerken van 100 000 tryptische peptiden",
+            "Time (s)",
+            "Proteïnedatabank",
+            ["I ≠ L", "I = L"],
+            label_formatter=time_formatter_sec,
+        ),
+        ComparisonGraph(  # search only Unipept 6.x
+            {
+                "I ≠ L": [
+                    117.936,
+                    24.500,
+                    3.1743333333333,
+                    2.4996666666667,
+                    5.005,
+                    8.3986666666667,
+                    6.139,
+                    2.5673333333333,
+                ],
+                "I = L": [
+                    95.4246666667,
+                    31.3756666666667,
+                    4.562,
+                    4.2593333333333,
+                    6.7183333333333,
+                    9.9463333333333,
+                    6.319,
+                    3.4423333333333,
+                ],
+            },
+            "Tijd (s) nodig voor het verwerken van een peptidebestand met missed cleavage handling",
+            "Time (s)",
+            "Proteïnedatabank",
+            [
+                "Swiss-Prot tryptisch",
+                "Swiss-Prot missed cleavages",
+                "SIHUMI 03",
+                "SIHUMI 05",
+                "SIHUMI 07",
+                "SIHUMI 08",
+                "SIHUMI 11",
+                "SIHUMI 14",
+            ],
             label_formatter=time_formatter_sec,
         ),
     ]
@@ -997,18 +1093,20 @@ if __name__ == "__main__":
                 {
                     "Libdivsufsort": [
                         sum(libdivsufsort_build_time_uniprot)
+                        * 0.001
                         / len(libdivsufsort_build_time_uniprot)
                     ],
                     "Libsais": [
                         sum(libsais_build_time_uniprot)
+                        * 0.001
                         / len(libsais_build_time_uniprot)
                     ],
                 },
-                "Tijd (ms) om de suffixarray op te bouwen voor UniProtKB",
-                "Tijd (ms)",
+                "Tijd (s) om de suffixarray op te bouwen voor UniProtKB",
+                "Tijd (s)",
                 "",
                 [""],
-                label_formatter=time_formatter_ms,
+                label_formatter=time_formatter_sec,
             ),
             ComparisonGraph(
                 {
